@@ -26,7 +26,7 @@ beta2 = 1 - beta1
 
 # Elasticity parameters
 # Only vary elasticities of prey deaths
-f_x = np.linspace(0, 2, n) # Predation elasticity w resp. x
+#f_x = np.linspace(0, 2, n) # Predation elasticity w resp. x
 m_x = f_x # Mortality elasticiy of prey
 f_y = 2 # quadratic predation rate for predators
 m_y = 1 # Mortality elasticiy of predators
@@ -43,15 +43,51 @@ def saddleCond(x,y):
     s_x = (a*b-c)/b
     return s_x
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-X,Y = np.meshgrid(beta1,f_x)
+#fig = plt.figure()
+#ax = fig.add_subplot(111, projection='3d')
+#X,Y = np.meshgrid(beta1,f_x)
+#
+#zs = np.array(saddleCond(np.ravel(X), np.ravel(Y)))
+#Z = zs.reshape(X.shape)
+#
+#ax.plot_surface(X, Y, Z)
+#ax.set_xlabel('Relative contribution parameter for deaths')
+#ax.set_ylabel('Elasticity of predation rate w resp. prey')
+#ax.set_zlabel('Elasticiy of prey birth rate')
+#plt.show()
 
-zs = np.array(saddleCond(np.ravel(X), np.ravel(Y)))
+
+# Remap parameters for Hopf surface
+alpha_r = np.linspace(0,1, n)
+beta = np.linspace(0,1, n)
+
+
+def hopfCond(alphaR, beta):
+    #Hopf condition in terms of alphaR, beta
+    s_x = 2
+    d_x = 1
+    f_y = 1
+    
+    e1 = alphaR*(f_y-m_y)
+    e2 = s_x - beta*d_x
+    
+    fx = (1/(1-beta))*(e1+e2)
+
+    return fx
+
+X,Y = np.meshgrid(alpha_r, beta)
+
+zs = np.array(hopfCond(np.ravel(X), np.ravel(Y)))
 Z = zs.reshape(X.shape)
 
-ax.plot_surface(X, Y, Z)
-ax.set_xlabel('Relative contribution parameter for deaths')
-ax.set_ylabel('Elasticity of predation rate w resp. prey')
-ax.set_zlabel('Elasticiy of prey birth rate')
+fig2=plt.figure()
+ax2 = fig2.add_subplot(111, projection='3d')
+ax2.plot_surface(Y, X, Z)
+plt.xlim(1,0)
+ax2.set_xlabel('alpha_r')
+ax2.set_ylabel('beta')
+ax2.set_zlabel('fx')
 plt.show()
+
+
+

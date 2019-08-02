@@ -11,7 +11,7 @@ import numpy as np
 
 # X = prey, Y = predators
 
-# Linspace range
+# Samples
 n = 100
 # Timescales
 # Fix timescales to be equivalent to foxes and rabbits
@@ -21,12 +21,12 @@ alphax = 1/4
 alphay = 1/1.5
 
 # Beta parameters
-beta1 = np.linspace(0, 1, n)
+beta1 = np.random.uniform(low=0.0, high = 1.0, size=n)
 beta2 = 1 - beta1
 
 # Elasticity parameters
 # Only vary elasticities of prey deaths
-#f_x = np.linspace(0, 2, n) # Predation elasticity w resp. x
+f_x = np.random.uniform(low=0.0, high = 2.0, size=n) # Predation elasticity w resp. x
 m_x = f_x # Mortality elasticiy of prey
 f_y = 2 # quadratic predation rate for predators
 m_y = 1 # Mortality elasticiy of predators

@@ -67,8 +67,8 @@ data['Hopf Sx'] = hopf_sx
 
 df = pd.DataFrame(data)
 
-dfSaddle = df[abs(df['Saddle Sx']) <= 0.1 ]
-dfHopf = df[abs(df['Hopf Sx']) <= 0.1 ]
+dfSaddle = df[abs(df['Saddle Sx']) <= 0.01 ]
+dfHopf = df[abs(df['Hopf Sx']) <= 0.01 ]
 
 #Plot pairs of parameters which give Saddle bifurcation
 fig2 = plt.figure()

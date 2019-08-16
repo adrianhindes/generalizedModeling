@@ -10,6 +10,8 @@ from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from scipy import stats
+import pandas as pd
+import seaborn as sns
 # M = mangrove biomass (kg), P = peat soil elevation (mm)
 # S = soil salinity (ppm?)
 
@@ -21,9 +23,9 @@ n = 10000
 # ---------------
 # 1/years turnover rates
 # total guesses at the moment
-alphaM = 1.
-alphaP = 1.
-alphaS = 1.
+alphaM = 1/6
+alphaP = 1/3.
+alphaS = 3.
 
 
 
@@ -32,59 +34,60 @@ alphaS = 1.
 # ----------------
 # Must add to 1
 # Mangrove gain
-betaP = random.uniform(0,0.5,n) # from propagules & established saplings
+betaP = random.uniform(0,1,n) # from propagules & established saplings
 betaG = 1-betaP # from endogenous growth of existing trees
 
-# Mangrove loss
-betaD = 0.3
-betaS = 0.5
-betaL = 1-betaD-betaS
+# Mangrove (biomass) loss
+betaL = random.uniform(0,1,n) # litter fall
+betaD = random.uniform(0,1-betaL, n) # drowning
+betaS = 1-betaL-betaD # salt stress
+
 
 # Peat gain
-betaA = 0.6
-betaR = 0.1
-betaV = 1 - betaA - betaR
+betaR = random.uniform(0,1,n) # retained litterfall
+betaA = random.uniform(0, 1-betaR, n) #sediment accretion
+betaV = 1 - betaA - betaR #volume incrcease
 
 #Peat loss
-betaE = 0.5
+betaE = random.uniform(0,1,n)
 betaSB = 1 - betaE
 
 # ----------------------
 # Elasticity parameters
 # ----------------------
-hydP = random.uniform(-2.0, 0.0, n)
+hydP = random.uniform(-2.0, 2.0, n)
 # Mangroves
-propM = 1 
+propM = random.uniform(1, 2, n) 
 propS = random.uniform(-1.0, 0.0, n)
-growM = 1
+growM = random.uniform(1, 2, n)
 
 drownHyd = random.uniform(0.0, 5.0, n)
-drownM = 1 
+drownM = random.uniform(0, 1, n) 
 
-stressM = 1
+stressM = random.uniform(0, 2, n)
 stressS = random.uniform(0.0, 2.0, n)
 
 littM = random.uniform(1.0, 2.0, n)
 
 # Peat soils
-accSed = 1 
+accSed = random.uniform(1, 2, n) 
 sedHyd = random.uniform(0.0, 2.0, n)
-accM = 1
+accM = random.uniform(1, 2, n)
 
-retLitt = 1
+retLitt = random.uniform(0, 2, n)
 retHyd = random.uniform(-2.0, 0.0, n)
 
-volGrow = 1
-volP = 1
+volGrow = random.uniform(1, 2, n)
+volP = random.uniform(0.5, 1.5, n)
 
-eroM = 1
+eroM = random.uniform(1, 2, n)
 
-subsM = 1
+subsM = random.uniform(1, 3, n)
 subsHyd = random.uniform(0.0, 1.0, n)
 subsP = random.uniform(0.5, 1.5, n)
 
 # Salinity
-inM = 1.0 
+inM = random.uniform(0,2,n)
 inS = random.uniform(0.0, 1.0, n)
 
 outS = 1
@@ -100,31 +103,66 @@ def stability(eigs):
     return result
 # Construct dataframe to track parameters and associated eigenvalues
 # Parameters that are varying
-data = {'betaP':betaP,'hydP':hydP,'propS':propS,
-        'drownHyd':drownHyd,'stressS':stressS,
-        'littM':littM,'sedHyd':sedHyd,'retHyd':retHyd,
-        'subsHyd':subsHyd,'subsP':subsP,'inS':inS,
-        'eigs':[], 'eigsV':[],'stab':[]}
+data = {'betaP':betaP,'betaD':betaD,'betaL':betaL,
+        'betaA':betaA,'betaR':betaR,'betaE':betaE,
+        'hydP':hydP,'propM':propM,'propS':propS,'growM':growM,
+        'drownHyd':drownHyd,'drownM':drownM,'stressM':stressM,
+        'stressS':stressS,'littM':littM,'accSed':accSed,
+        'sedHyd':sedHyd,'accM':accM,'retLitt':retLitt,'retHyd':retHyd,
+        'volGrow':volGrow,'volP':volP,'eroM':eroM,'subsM':subsM,
+        'subsHyd':subsHyd,'subsP':subsP,'inS':inS,'inM':inM}
 
+eigs = [] #eigenvalue triplets
+eigsV = [] #eigenvector triplets
+stab = [] #stability (0,1)
+determ = [] # determinant of Jacobian
 for j in tqdm(range(n)):
     
     # Remap parameters
     betaP = data['betaP'][j]
+    betaD = data['betaD'][j]
+    betaL = data['betaL'][j]
+    
+    betaA = data['betaA'][j]
+    betaR = data['betaR'][j]
+    betaE = data['betaE'][j]
+    
     hydP = data['hydP'][j]
+    propM = data['propM'][j]
     propS = data['propS'][j]
+    growM = data['growM'][j]
+    
     drownHyd = data['drownHyd'][j]
+    drownM = data['drownM'][j]
+    stressM = data['stressM'][j]
     stressS = data['stressS'][j]
+    
     littM = data['littM'][j]
+    accSed = data['accSed'][j]
     sedHyd = data['sedHyd'][j]
+    accM = data['accM'][j]
+    retLitt = data['retLitt'][j]
     retHyd = data['retHyd'][j]
+    volGrow = data['volGrow'][j]
+    volP = data['volP'][j]
+    
+    eroM = data['eroM'][j]
+    subsM = data['subsM'][j]
     subsHyd = data['subsHyd'][j]
     subsP = data['subsP'][j]
     inS = data['inS'][j]
+    inM = data['inM'][j]
     
     # Define Jacobian matrix elements
     # Note syntax here is not strictly correct - dmdm == (dm/dt)/dm
-    dmdm = betaP*propM +(1-betaP)*growM -betaS*stressM -betaD*drownM -betaL*littM
-    dmdp = -betaD*hydP*drownHyd
+    
+    betaG = 1-betaP
+    betaS = 1-betaD-betaL
+    betaSB = 1-betaE
+    betaV = 1-betaA-betaR
+    
+    dmdm = betaP*propM +betaG*growM -betaS*stressM -betaD*drownM -betaL*littM
+    dmdp = -1*betaD*hydP*drownHyd
     dmds = betaP*propS -betaS*stressS
 
     dpdm = betaA*accM +betaR*retLitt*littM + betaV*volGrow*growM\
@@ -150,54 +188,38 @@ for j in tqdm(range(n)):
                       [dsdm, dsdp, dsds]])
     jac = np.matmul(alphas, jac0)
     w, v = LA.eig(jac)
+    det = LA.det(jac)
     
-    data['eigs'].append(w)
-    data['eigsV'].append(v)
-    data['stab'].append(stability(w))
-    
+    eigs.append(w)
+    eigsV.append(v)
+    stab.append(stability(w))
+    determ.append(det)
 
 
 x = data['hydP']
-ys = data['eigs']
-y0 = []
-y1 = []
-y2 = []
-
-yz = []
+y = []
 for j in range(n):
-    y0.append(np.real(ys[j][0]))
-    y1.append(np.real(ys[j][1]))
-    y2.append(np.real(ys[j][2]))
-    
-    yz.append(np.max(np.real(ys[j])))
+    y.append(np.max(np.real(eigs[j])))
 
-p1 = plt.scatter(x,yz)
-plt.xlabel('HydP')
-plt.ylabel('Re(max eigenvalue)')
-plt.show()
+#p1 = plt.scatter(x,y)
+#plt.xlabel('HydP')
+#plt.ylabel('Re(max eigenvalue)')
+#plt.show()
 
 # Compute correlations
 
+
+
+corrs = {k:(np.corrcoef(data[k],stab)[0,1]) for (k,v) in data.items() }
         
-betaPCor = np.corrcoef(data['betaP'],data['stab'])[0,1]
-hydPCor = np.corrcoef(data['hydP'],data['stab'])[0,1]
-propSCor = np.corrcoef(data['propS'],data['stab'])[0,1]
-drownHydCor = np.corrcoef(data['drownHyd'],data['stab'])[0,1]
-stressSCor = np.corrcoef(data['stressS'],data['stab'])[0,1]
-littMCor = np.corrcoef(data['littM'],data['stab'])[0,1]
-sedHydCor = np.corrcoef(data['sedHyd'],data['stab'])[0,1]
-retHydCor = np.corrcoef(data['retHyd'],data['stab'])[0,1]
-subsHydCor = np.corrcoef(data['subsHyd'],data['stab'])[0,1]
-subsPCor = np.corrcoef(data['subsP'],data['stab'])[0,1]
-inSCor = np.corrcoef(data['inS'],data['stab'])[0,1]
 
-corrs = [betaPCor, hydPCor, propSCor, drownHydCor, stressSCor, littMCor,
-         sedHydCor, retHydCor, subsHydCor, subsPCor, inSCor]
-labels = ['betaP','hydP','propS','drownHyd','stressS','littM','sedHyd',
-          'retHyd','subsHyd','subsP','inS']
 
-p2 = plt.bar(np.arange(11), corrs)
+p2 = plt.bar(range(len(corrs)), corrs.values())
+
 plt.ylabel('Correlation Coefficient')
 plt.xlabel('Parameter')
-plt.xticks(np.arange(11), labels,rotation=70)
+plt.xticks(range(len(corrs)), list(data.keys()), rotation=70)
 plt.show()
+
+
+

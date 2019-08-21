@@ -58,7 +58,7 @@ betaSB = 1 - betaE
 hydP = random.uniform(-2.0, 2.0, n)
 # Mangroves
 propM = random.uniform(1, 2, n) 
-propS = random.uniform(-1, 0.0, n)
+propS = random.uniform(-5, 0.0, n)
 growM = random.uniform(1, 2, n)
 
 drownHyd = random.uniform(0.0, 5.0, n)
@@ -196,13 +196,7 @@ for j in tqdm(range(n)):
     determ.append(det)
 
 
-x = data['hydP']
-y = []
-for j in range(n):
-    y.append(np.max(np.real(eigs[j])))
 
-p1 = plt.scatter(range(n),y)
-plt.show()
 #p1 = plt.scatter(x,y)
 #plt.xlabel('HydP')
 #plt.ylabel('Re(max eigenvalue)')
@@ -213,14 +207,18 @@ plt.show()
 
 
 corrs = {k:(np.corrcoef(data[k],stab)[0,1]) for (k,v) in data.items() }
-        
+corrs2 = {k: np.abs(v) for (k,v) in corrs.items()}
+corrsSorted = sorted(corrs2.items(), key=lambda x: x[1], reverse=True)
+delN = len(corrsSorted) - 10
+del corrsSorted[-delN:]
 
+corrs3 = {k: corrs[k] for (k,v) in corrsSorted}
 
-p2 = plt.bar(range(len(corrs)), corrs.values())
+p2 = plt.bar(range(len(corrs3)), corrs3.values())
 
 plt.ylabel('Correlation Coefficient')
 plt.xlabel('Parameter')
-plt.xticks(range(len(corrs)), list(data.keys()), rotation=70)
+plt.xticks(range(len(corrsSorted)), list(corrs3.keys()), rotation=70)
 plt.show()
 
 

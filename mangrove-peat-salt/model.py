@@ -55,7 +55,7 @@ betaSB = 1 - betaE
 hydP = random.uniform(-2.0, 0.0, n)
 # Mangroves
 propM = 1 
-propS = random.uniform(-1.0, 0.0, n)
+propS = -41
 growM = 1
 
 drownHyd = random.uniform(0.0, 5.0, n)
@@ -100,7 +100,7 @@ def stability(eigs):
     return result
 # Construct dataframe to track parameters and associated eigenvalues
 # Parameters that are varying
-data = {'betaP':betaP,'hydP':hydP,'propS':propS,
+data = {'betaP':betaP,'hydP':hydP,
         'drownHyd':drownHyd,'stressS':stressS,
         'littM':littM,'sedHyd':sedHyd,'retHyd':retHyd,
         'subsHyd':subsHyd,'subsP':subsP,'inS':inS,
@@ -111,7 +111,6 @@ for j in tqdm(range(n)):
     # Remap parameters
     betaP = data['betaP'][j]
     hydP = data['hydP'][j]
-    propS = data['propS'][j]
     drownHyd = data['drownHyd'][j]
     stressS = data['stressS'][j]
     littM = data['littM'][j]
@@ -171,17 +170,14 @@ for j in range(n):
     
     yz.append(np.max(np.real(ys[j])))
 
-p1 = plt.scatter(x,yz)
-plt.xlabel('HydP')
-plt.ylabel('Re(max eigenvalue)')
-plt.show()
+p1 = plt.scatter(range(n),yz)
 
 # Compute correlations
 
         
 betaPCor = np.corrcoef(data['betaP'],data['stab'])[0,1]
 hydPCor = np.corrcoef(data['hydP'],data['stab'])[0,1]
-propSCor = np.corrcoef(data['propS'],data['stab'])[0,1]
+#propSCor = np.corrcoef(data['propS'],data['stab'])[0,1]
 drownHydCor = np.corrcoef(data['drownHyd'],data['stab'])[0,1]
 stressSCor = np.corrcoef(data['stressS'],data['stab'])[0,1]
 littMCor = np.corrcoef(data['littM'],data['stab'])[0,1]
@@ -191,9 +187,9 @@ subsHydCor = np.corrcoef(data['subsHyd'],data['stab'])[0,1]
 subsPCor = np.corrcoef(data['subsP'],data['stab'])[0,1]
 inSCor = np.corrcoef(data['inS'],data['stab'])[0,1]
 
-corrs = [betaPCor, hydPCor, propSCor, drownHydCor, stressSCor, littMCor,
+corrs = [betaPCor, hydPCor, drownHydCor, stressSCor, littMCor,
          sedHydCor, retHydCor, subsHydCor, subsPCor, inSCor]
-labels = ['betaP','hydP','propS','drownHyd','stressS','littM','sedHyd',
+labels = ['betaP','hydP','drownHyd','stressS','littM','sedHyd',
           'retHyd','subsHyd','subsP','inS']
 
 p2 = plt.bar(np.arange(11), corrs)

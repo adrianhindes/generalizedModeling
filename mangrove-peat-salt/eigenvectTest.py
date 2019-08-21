@@ -9,9 +9,7 @@ from numpy import random
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from scipy import stats
-import pandas as pd
-import seaborn as sns
+
 # M = mangrove biomass (kg), P = peat soil elevation (mm)
 # S = soil salinity (ppm?)
 
@@ -92,11 +90,10 @@ inS = random.uniform(0.0, 1.0, n)
 
 outS = 1
 
-def stability(eigs):
+def stability(eig):
     # take in vector of eigenvalues
     # tell if system stable or not (stable if all eigenvalues are less than zero)
-    reals = np.real(eigs)
-    if max(reals) < 0:
+    if np.real(eig) < 0:
         result = 1
     else:
         result = 0
@@ -116,6 +113,8 @@ eigs = [] #eigenvalue triplets
 eigsV = [] #eigenvector triplets
 stab = [] #stability (0,1)
 determ = [] # determinant of Jacobian
+
+
 for j in tqdm(range(n)):
     
     # Remap parameters
@@ -126,7 +125,6 @@ for j in tqdm(range(n)):
     betaA = data['betaA'][j]
     betaR = data['betaR'][j]
     betaE = data['betaE'][j]
-    
     hydP = data['hydP'][j]
     propM = data['propM'][j]
     propS = data['propS'][j]
@@ -190,38 +188,71 @@ for j in tqdm(range(n)):
     w, v = LA.eig(jac)
     det = LA.det(jac)
     
-    eigs.append(w)
-    eigsV.append(v)
-    stab.append(stability(w))
+    eigMax = np.max(w)
+    eigVMax = v[: , w.argmax()]
+    
+    eigs.append(eigMax)
+    eigsV.append(eigVMax)
+    stable = np.real(eigMax) < 0
+    stab.append(stable)
     determ.append(det)
 
-
-x = data['hydP']
-y = []
+mangsV = []
+peatsV = []
+saltsV = []
 for j in range(n):
-    y.append(np.max(np.real(eigs[j])))
+    mangsV.append(np.real(eigsV[j][0]))
+    peatsV.append(np.real(eigsV[j][1]))
+    saltsV.append(np.real(eigsV[j][2]))
 
-p1 = plt.scatter(range(n),y)
-plt.show()
+eigVDirsStable = {'+++':0,'++-':0,'+-+':0,'+--':0,'-++':0,'-+-':0,'--+':0,'---':0}
+eigVDirsUnstable = {'+++':0,'++-':0,'+-+':0,'+--':0,'-++':0,'-+-':0,'--+':0,'---':0}
+
+def plusMin(val):
+    if val < 0:
+        ret = '-'
+    elif val > 0:
+        ret = '+'
+    else: ret = '0'
+    return ret
+
+stableIndices = []
+unstableIndices = []
+
+for j in range(n):
+    if stab[j]:
+        stableIndices.append(j)
+for j in range(n):
+    if not(stab[j]):
+        unstableIndices.append(j)
+
+
+
+for j in range(len(stableIndices)):
+    i = stableIndices[j]
+    key = ''
+    key += plusMin(mangsV[i])
+    key += plusMin(peatsV[i])
+    key += plusMin(saltsV[i])
+    eigVDirsStable[key] += 1
+
+for j in range(len(unstableIndices)):
+    i = unstableIndices[j]
+    key = ''
+    key += plusMin(mangsV[i])
+    key += plusMin(peatsV[i])
+    key += plusMin(saltsV[i])
+    eigVDirsUnstable[key] += 1
+
+
+
+        
+
 #p1 = plt.scatter(x,y)
 #plt.xlabel('HydP')
 #plt.ylabel('Re(max eigenvalue)')
 #plt.show()
 
 # Compute correlations
-
-
-
-corrs = {k:(np.corrcoef(data[k],stab)[0,1]) for (k,v) in data.items() }
-        
-
-
-p2 = plt.bar(range(len(corrs)), corrs.values())
-
-plt.ylabel('Correlation Coefficient')
-plt.xlabel('Parameter')
-plt.xticks(range(len(corrs)), list(data.keys()), rotation=70)
-plt.show()
-
 
 

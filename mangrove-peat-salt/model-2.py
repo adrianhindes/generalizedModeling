@@ -9,14 +9,14 @@ from numpy import random
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from scipy import stats
-import pandas as pd
-import seaborn as sns
+
 # M = mangrove biomass (kg), P = peat soil elevation (mm)
 # S = soil salinity (ppm?)
 
 # Linspace range
 n = 10000
+
+
 
 # ---------------
 # Timescales
@@ -49,7 +49,7 @@ betaA = random.uniform(0, 1-betaR, n) #sediment accretion
 betaV = 1 - betaA - betaR #volume incrcease
 
 #Peat loss
-betaE = random.uniform(0,1,n)
+betaE = np.array([0.8]*n)
 betaSB = 1 - betaE
 
 # ----------------------
@@ -58,13 +58,13 @@ betaSB = 1 - betaE
 hydP = random.uniform(-2.0, 2.0, n)
 # Mangroves
 propM = random.uniform(1, 2, n) 
-propS = random.uniform(-1, 0.0, n)
-growM = random.uniform(1, 2, n)
+propS = random.uniform(-5, 0.0, n)
+growM = np.array([1]*n)
 
 drownHyd = random.uniform(0.0, 5.0, n)
-drownM = random.uniform(0, 1, n) 
+drownM = np.array([1]*n)
 
-stressM = random.uniform(0, 2, n)
+stressM = np.array([1]*n)
 stressS = random.uniform(0.0, 2.0, n)
 
 littM = random.uniform(1.0, 2.0, n)
@@ -192,35 +192,38 @@ for j in tqdm(range(n)):
     
     eigs.append(w)
     eigsV.append(v)
+    
+    eigMax = np.max(np.real(w))
+    eigVMax = v[: , w.argmax()]
+    
+    eigs.append(eigMax)
+    eigsV.append(eigVMax)
+    stable = np.real(eigMax) < 0
+    
+    
     stab.append(stability(w))
     determ.append(det)
 
 
-x = data['hydP']
-y = []
-for j in range(n):
-    y.append(np.max(np.real(eigs[j])))
 
-p1 = plt.scatter(range(n),y)
-plt.show()
-#p1 = plt.scatter(x,y)
-#plt.xlabel('HydP')
-#plt.ylabel('Re(max eigenvalue)')
-#plt.show()
-
-# Compute correlations
 
 
 
 corrs = {k:(np.corrcoef(data[k],stab)[0,1]) for (k,v) in data.items() }
         
+corrs2 = {k: np.abs(v) for (k,v) in corrs.items()}
+corrsSorted = sorted(corrs2.items(), key=lambda x: x[1], reverse=True)
+delN = len(corrsSorted) - 10
+del corrsSorted[-delN:]
 
+corrs3 = {k: corrs[k] for (k,v) in corrsSorted}
 
-p2 = plt.bar(range(len(corrs)), corrs.values())
+p2 = plt.bar(range(len(corrs3)), corrs3.values())
 
 plt.ylabel('Correlation Coefficient')
 plt.xlabel('Parameter')
-plt.xticks(range(len(corrs)), list(data.keys()), rotation=70)
+plt.xticks(range(len(corrsSorted)), list(corrs3.keys()), rotation=70)
+
 plt.show()
 
 

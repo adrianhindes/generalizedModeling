@@ -14,10 +14,10 @@ import pylab as p
 from scipy import integrate
 #----------------------------------------
 # Lotka Volterra parameters
-a = 1. # Prey growth rate
-b = 0.1 #Background prey mortality rate
-c = 1.5 #Bockground predator mortality rate
-d = 0.75 #Predaction conversion efficiency
+a = 2. # Prey growth rate
+b = 0.2 #Background prey mortality rate
+c = 1.3 #Bockground predator mortality rate
+d = 0.65 #Predation conversion efficiency
 
 # X[0] = prey, x[1] = predator
 #----------------------------------------

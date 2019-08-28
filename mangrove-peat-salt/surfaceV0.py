@@ -38,7 +38,7 @@ alphaS = 1.
 # ----------------
 # Must add to 1
 # Mangrove gain
-betaP = random.uniform(0,0.5,n) # from propagules & established saplings
+betaP = 0.1 # from propagules & established saplings
 betaG = 1-betaP # from endogenous growth of existing trees
 
 # Mangrove loss
@@ -47,9 +47,10 @@ betaS = 0.5
 betaL = 1-betaD-betaS
 
 # Peat gain
-betaA = 0.6
-betaR = 0.1
-betaV = 1 - betaA - betaR
+betaA = 0.4
+betaV = 0.4
+betaR = 1- betaA - betaV
+
 
 #Peat loss
 betaE = 0.5

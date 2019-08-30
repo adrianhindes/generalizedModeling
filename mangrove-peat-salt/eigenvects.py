@@ -9,98 +9,120 @@ from numpy import random
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from scipy import stats
-import pandas as pd
-import seaborn as sns
+
+from parameterDefaults import *
+startParams = [betas, mangs, peats, salts]
+from droughtParams import *
+endParams = [betas, mangs, peats, salts]
 # M = mangrove biomass (kg), P = peat soil elevation (mm)
 # S = soil salinity (ppm?)
 
 # Linspace range
 n = 10000
 
+
+
 # ---------------
 # Timescales
 # ---------------
 # 1/years turnover rates
 # total guesses at the moment
-alphaM = 1/6
+alphaM = 1/6.
 alphaP = 1/3.
-alphaS = 3.
-
+alphaS = 6.
 
 
 # ----------------
 # Beta parameters
 # ----------------
+betas = {}
+for key in set(startParams[0]):
+    betas[key] = (startParams[0][key],endParams[0][key])
+    
 # Must add to 1
 # Mangrove gain
-betaP = random.uniform(0,1,n) # from propagules & established saplings
+betaP = np.linspace(betas['betaP'][0], betas['betaP'][1], n) # from propagules & established saplings
 betaG = 1-betaP # from endogenous growth of existing trees
 
 # Mangrove (biomass) loss
-betaL = random.uniform(0,1,n) # litter fall
-betaD = random.uniform(0,1-betaL, n) # drowning
+betaL = np.linspace(betas['betaL'][0], betas['betaL'][1], n) # litter fall
+betaD = np.linspace(betas['betaD'][0], betas['betaD'][1], n)
 betaS = 1-betaL-betaD # salt stress
 
 
 # Peat gain
-betaR = random.uniform(0,1,n) # retained litterfall
-betaA = random.uniform(0, 1-betaR, n) #sediment accretion
+betaR = np.linspace(betas['betaR'][0], betas['betaR'][1], n) # retained litterfall
+betaA = np.linspace(betas['betaA'][0], betas['betaA'][1], n) #sediment accretion
 betaV = 1 - betaA - betaR #volume incrcease
 
 #Peat loss
-betaE = random.uniform(0,1,n)
+betaE = np.linspace(betas['betaE'][0], betas['betaE'][1], n)
 betaSB = 1 - betaE
 
 # ----------------------
 # Elasticity parameters
 # ----------------------
-hydP = random.uniform(-2.0, 2.0, n)
 # Mangroves
-propM = random.uniform(1, 2, n) 
-propS = random.uniform(-1, 0.0, n)
-growM = random.uniform(1, 2, n)
 
-drownHyd = random.uniform(0.0, 5.0, n)
-drownM = random.uniform(0, 1, n) 
+mangs = {}
+for key in set(startParams[1]):
+    mangs[key] = (startParams[1][key],endParams[1][key])
+    
+propM = np.linspace(mangs['propM'][0], mangs['propM'][1], n) 
+propS = np.linspace(mangs['propS'][0], mangs['propS'][1], n) 
+growM = np.linspace(mangs['growM'][0], mangs['growM'][1], n) 
 
-stressM = random.uniform(0, 2, n)
-stressS = random.uniform(0.0, 2.0, n)
+drownHyd = np.linspace(mangs['drownHyd'][0], mangs['drownHyd'][1], n) 
+drownM = np.linspace(mangs['drownM'][0], mangs['drownM'][1], n) 
 
-littM = random.uniform(1.0, 2.0, n)
+stressM = np.linspace(mangs['stressM'][0], mangs['stressM'][1], n) 
+stressS = np.linspace(mangs['stressS'][0], mangs['stressS'][1], n) 
+
+littM = np.linspace(mangs['littM'][0], mangs['littM'][1], n) 
 
 # Peat soils
-accSed = random.uniform(1, 2, n) 
-sedHyd = random.uniform(0.0, 2.0, n)
-accM = random.uniform(1, 2, n)
+peats = {}
+for key in set(startParams[2]):
+    peats[key] = (startParams[2][key],endParams[2][key])
+    
+accSed = np.linspace(peats['accSed'][0], peats['accSed'][1], n) 
+sedHyd = np.linspace(peats['sedHyd'][0], peats['sedHyd'][1], n) 
+accM = np.linspace(peats['accM'][0], peats['accM'][1], n) 
 
-retLitt = random.uniform(0, 2, n)
-retHyd = random.uniform(-2.0, 0.0, n)
+retLitt = np.linspace(peats['retLitt'][0], peats['retLitt'][1], n) 
+retHyd = np.linspace(peats['retHyd'][0], peats['retHyd'][1], n) 
 
-volGrow = random.uniform(1, 2, n)
-volP = random.uniform(0.5, 1.5, n)
+volGrow = np.linspace(peats['volGrow'][0], peats['volGrow'][1], n) 
+volP = np.linspace(peats['volP'][0], peats['volP'][1], n) 
 
-eroM = random.uniform(1, 2, n)
+eroM = np.linspace(peats['eroM'][0], peats['eroM'][1], n) 
 
-subsM = random.uniform(1, 3, n)
-subsHyd = random.uniform(0.0, 1.0, n)
-subsP = random.uniform(0.5, 1.5, n)
+subsM = np.linspace(peats['subsM'][0], peats['subsM'][1], n) 
+subsHyd = np.linspace(peats['subsHyd'][0], peats['subsHyd'][1], n)
+subsP = np.linspace(peats['subsP'][0], peats['subsP'][1], n) 
+
+hydP = np.linspace(peats['hydP'][0], peats['hydP'][1], n) 
 
 # Salinity
-inM = random.uniform(0,2,n)
-inS = random.uniform(0.0, 1.0, n)
+salts = {}
+for key in set(startParams[3]):
+    salts[key] = (startParams[3][key],endParams[3][key])
+    
+    
+inM = np.linspace(salts['inM'][0],salts['inM'][1], n)
+inS = np.linspace(salts['inS'][0],salts['inS'][1], n)
 
-outS = 1
+outS = np.linspace(salts['outS'][0],salts['outS'][1], n)
 
-def stability(eigs):
+def stability(eig):
     # take in vector of eigenvalues
     # tell if system stable or not (stable if all eigenvalues are less than zero)
-    reals = np.real(eigs)
-    if max(reals) < 0:
+    if np.real(eig) < 0:
         result = 1
     else:
         result = 0
     return result
+
 # Construct dataframe to track parameters and associated eigenvalues
 # Parameters that are varying
 data = {'betaP':betaP,'betaD':betaD,'betaL':betaL,
@@ -110,12 +132,14 @@ data = {'betaP':betaP,'betaD':betaD,'betaL':betaL,
         'stressS':stressS,'littM':littM,'accSed':accSed,
         'sedHyd':sedHyd,'accM':accM,'retLitt':retLitt,'retHyd':retHyd,
         'volGrow':volGrow,'volP':volP,'eroM':eroM,'subsM':subsM,
-        'subsHyd':subsHyd,'subsP':subsP,'inS':inS,'inM':inM}
+        'subsHyd':subsHyd,'subsP':subsP,'inS':inS,'inM':inM,'outS':outS}
 
 eigs = [] #eigenvalue triplets
 eigsV = [] #eigenvector triplets
 stab = [] #stability (0,1)
 determ = [] # determinant of Jacobian
+
+
 for j in tqdm(range(n)):
     
     # Remap parameters
@@ -126,7 +150,6 @@ for j in tqdm(range(n)):
     betaA = data['betaA'][j]
     betaR = data['betaR'][j]
     betaE = data['betaE'][j]
-    
     hydP = data['hydP'][j]
     propM = data['propM'][j]
     propS = data['propS'][j]
@@ -152,6 +175,7 @@ for j in tqdm(range(n)):
     subsP = data['subsP'][j]
     inS = data['inS'][j]
     inM = data['inM'][j]
+    outS = data['outS'][j]
     
     # Define Jacobian matrix elements
     # Note syntax here is not strictly correct - dmdm == (dm/dt)/dm
@@ -190,38 +214,50 @@ for j in tqdm(range(n)):
     w, v = LA.eig(jac)
     det = LA.det(jac)
     
-    eigs.append(w)
-    eigsV.append(v)
-    stab.append(stability(w))
+    eigMax = np.max(w)
+    eigVMax = v[: , w.argmax()]
+    
+    eigs.append(eigMax)
+    eigsV.append(eigVMax)
+    stable = np.real(eigMax) < 0
+    stab.append(stable)
     determ.append(det)
 
-
-x = data['hydP']
-y = []
+mangsV = []
+peatsV = []
+saltsV = []
 for j in range(n):
-    y.append(np.max(np.real(eigs[j])))
+    mangsV.append(np.real(eigsV[j][0]))
+    peatsV.append(np.real(eigsV[j][1]))
+    saltsV.append(np.real(eigsV[j][2]))
 
-p1 = plt.scatter(range(n),y)
+
+
+p1 = plt.figure()
+#eigs1 = [np.real(a) for (a,b,c) in eigs]
+#eigs2 = [np.real(b) for (a,b,c) in eigs]
+#eigs3 = [np.real(c) for (a,b,c) in eigs]
+
+#plt.plot(eigs1)
+plt.plot(eigs)
+
+plt.title('Maximum eigenvalue from default to drought & low sea-level')
+plt.ylabel('Real part of eigenvalue')
 plt.show()
+
+p2 = plt.figure()
+plt.plot(mangsV,label='mangroves')
+plt.plot(peatsV,label='peats')
+plt.plot(saltsV,label='salinity')
+plt.legend(loc='best')
+plt.title('Eigenvector components from default to drought & low-sea level')
+        
+
 #p1 = plt.scatter(x,y)
 #plt.xlabel('HydP')
 #plt.ylabel('Re(max eigenvalue)')
 #plt.show()
 
 # Compute correlations
-
-
-
-corrs = {k:(np.corrcoef(data[k],stab)[0,1]) for (k,v) in data.items() }
-        
-
-
-p2 = plt.bar(range(len(corrs)), corrs.values())
-
-plt.ylabel('Correlation Coefficient')
-plt.xlabel('Parameter')
-plt.xticks(range(len(corrs)), list(data.keys()), rotation=70)
-plt.show()
-
 
 

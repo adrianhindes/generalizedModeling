@@ -26,7 +26,12 @@ def computeJac(data):
     hydP = data['hydP']
     propM = data['propM']
     propS = data['propS']
+    growS = data['growS']
     growM = data['growM']
+    
+    propPrecip = data['propPrecip']
+    growPrecip = data['growPrecip']
+    
     
     drownHyd = data['drownHyd']
     drownM = data['drownM']
@@ -48,10 +53,14 @@ def computeJac(data):
     subsP = data['subsP']
     
     
-    inS = data['inS']
-    inM = data['inM']
+    concS = data['concS']
+    concEvapt = data['concEvapt']
+    evaptM = data['evaptM']
+    concHyd = data['concHyd']
     
-    outS = data['outS']
+    decrS = data['decrS']
+    decrPrecip = data['decrPrecip']
+    precipEvapt = data['precipEvapt']
     
     
     
@@ -63,9 +72,12 @@ def computeJac(data):
     betaSB = 1-betaE
     betaV = 1-betaA-betaR
     
-    dmdm = betaP*propM +betaG*growM -betaS*stressM -betaD*drownM -betaL*littM
+    precipM = evaptM*precipEvapt
+    
+    dmdm = betaP*(propM + propPrecip*precipM) +betaG*(growM+growPrecip*precipM)\
+            +betaS*stressM -betaD*drownM -betaL*littM
     dmdp = -1*betaD*hydP*drownHyd
-    dmds = betaP*propS -betaS*stressS
+    dmds = betaP*propS +betaG*growS - betaS*stressS
 
     dpdm = betaA*accM +betaR*retLitt*littM + betaV*volGrow*growM\
             -betaE*eroM -betaSB*subsM
@@ -74,9 +86,9 @@ def computeJac(data):
             +betaV*volP-betaSB*subsP
     dpds = 0
     
-    dsdm = inM
-    dsdp = 0
-    dsds = inS - outS
+    dsdm = concEvapt*evaptM - decrPrecip*precipEvapt*evaptM
+    dsdp = concHyd*hydP
+    dsds = concS - decrS
     
     # alpha paramater array
     alphas = np.array([ [alphaM, 0, 0], [0, alphaP, 0], [0, 0, alphaS]])

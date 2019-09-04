@@ -77,7 +77,7 @@ def hopfCond(alphaR, beta):
 
 X,Y = np.meshgrid(alpha_r, beta)
 
-zs = np.array(hopfCond(np.ravel(X), np.ravel(Y)))
+zs = np.array(saddleCond(np.ravel(X), np.ravel(Y)))
 Z = zs.reshape(X.shape)
 
 fig2=plt.figure()

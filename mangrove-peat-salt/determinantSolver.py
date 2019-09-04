@@ -9,13 +9,14 @@ import numpy as np
 from numpy import random
 from numpy import linalg as LA
 import sympy as sp
+from sympy.printing import latex
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 
 from parameterDefaults import defaults
 
-sp.init_printing() # Make symbolic expressions look nice
+#sp.init_printing() # Make symbolic expressions look nice
 
 # Bifurcation surface parameters
 # Recall: betaG, betaL, betaV and betaSB are defined as 1 - other Betas
@@ -51,18 +52,22 @@ betaA, betaR, betaV, betaE, betaSB = betasPeat
 params += list(betasPeat)
 
 # Mangrove Elasticity
-elasMang = sp.symbols('grow_m, prop_m, prop_s, drown_hyd, drown_m, stress_m, stress_s, litt_m')
-growM, propM, propS, drownHyd, drownM, stressM, stressS, littM = elasMang
+elasMang = sp.symbols('grow_m, grow_s, prop_m, prop_s, drown_hyd, drown_m,\
+                      stress_m, stress_s,litt_m, \
+                      prop_precip, grow_precip, precip_evapt')
+growM, growS, propM, propS, drownHyd, drownM, stressM, stressS, littM,\
+                     propPrecip, growPrecip, precipEvapt = elasMang
 params += list(elasMang)
 
 # Peat soils
-elasPeat = sp.symbols('acc_sed, sed_hyd, acc_m, ret_litt, ret_hyd, vol_grow, vol_p, ero_m, subs_m, subs_hyd, subs_p')
+elasPeat = sp.symbols('acc_sed, sed_hyd, acc_m, ret_litt, ret_hyd, vol_grow,\
+                      vol_p, ero_m, subs_m, subs_hyd, subs_p')
 accSed, sedHyd, accM, retLitt, retHyd, volGrow, volP, eroM, subsM, subsHyd, subsP = elasPeat
 params += list(elasPeat)
 
 # Salinity
-elasSalt = sp.symbols('in_m, in_s, out_s, hyd_p')
-inM, inS, outS, hydP = elasSalt
+elasSalt = sp.symbols('conc_evapt, conc_hyd, evapt_m, decr_precip, precip_evapt, conc_s, decr_s, hyd_p')
+concEvapt, concHyd, evaptM, decrPrecip, precipEvapt,concS, decrS, hydP = elasSalt
 params += elasSalt
 
 def chSymtoLabel(sym):
@@ -76,29 +81,29 @@ def chSymtoLabel(sym):
 
     
 
-p1 = [betaP0, betaG0, betaD0, betaS0, betaL0]
-p2 = [betaA0, betaR0, betaV0, betaE0, betaSB0]
-p3 = [growM0, propM0, propS0, drownHyd0, drownM0, stressM0, stressS0, littM0]
-p4 = [accSed0, sedHyd0, accM0, retLitt0, retHyd0, volGrow0, volP0, eroM0, subsM0, subsHyd0, subsP0]
-p5 = [inM0, inS0, outS0, hydP0]
+#p1 = [betaP0, betaG0, betaD0, betaS0, betaL0]
+#p2 = [betaA0, betaR0, betaV0, betaE0, betaSB0]
+#p3 = [growM0, propM0, propS0, drownHyd0, drownM0, stressM0, stressS0, littM0]
+#p4 = [accSed0, sedHyd0, accM0, retLitt0, retHyd0, volGrow0, volP0, eroM0, subsM0, subsHyd0, subsP0]
+#p5 = [inM0, inS0, outS0, hydP0]
 
-ps = p1+p2+p3+p4+p5
+#ps = p1+p2+p3+p4+p5
 
 # Tuple list (symbol,default value)
 symDefaults = [(sym,defaults[chSymtoLabel(sym)]) for sym in params]
 
 #########
 #Bifurcation surface parameters
-X = betaA
-Y = inS
-Z = outS
+X = betaS
+Y = hydP
+Z = evaptM
 
 
 xMin = 0
 xMax = 1
 
-yMin = 0.5
-yMax = 1
+yMin = -1
+yMax = -0.1
 
 zAxMin = 0.5
 zAxMax = 1
@@ -107,9 +112,10 @@ zAxMax = 1
 #########
 # Jacobian components
 
-dmdm = betaP*propM +betaG*growM -betaS*stressM -betaD*drownM -betaL*littM
+dmdm = betaP*propM +betaG*growM + precipEvapt*evaptM*(betaP*propPrecip+betaG*growPrecip)\
+         -betaS*stressM -betaD*drownM -betaL*littM
 dmdp = -1*betaD*hydP*drownHyd
-dmds = betaP*propS -betaS*stressS
+dmds = betaP*propS + betaG*growS -betaS*stressS
 
 dpdm = betaA*accM +betaR*retLitt*littM + betaV*volGrow*growM\
             -betaE*eroM -betaSB*subsM
@@ -118,9 +124,9 @@ dpdp = hydP*(betaA*accSed*sedHyd + betaR*retHyd-betaSB*subsHyd)\
             +betaV*volP-betaSB*subsP
 dpds = 0
     
-dsdm = inM
-dsdp = 0
-dsds = inS - outS
+dsdm = concEvapt*evaptM - decrPrecip*precipEvapt*evaptM
+dsdp = concHyd*hydP
+dsds = concS - decrS
 
 # Define matrices
 
@@ -193,12 +199,12 @@ saddleManifold = subit(saddle, symDefaults, [X,Y,Z])
 
 # Surface equation for given X,Y,Z
 saddleFunc = sp.solve(saddleManifold, Z)[0]
-
+print(str(Z) +'=' + str(saddleFunc))
 saddleFun = sp.lambdify((X,Y), saddleFunc)
-x = np.linspace(xMin,xMax,points)
-y = np.linspace(yMin,yMax,points)
+xs = np.linspace(xMin,xMax,points)
+ys = np.linspace(yMin,yMax,points)
 
-xx, yy = np.meshgrid(x,y)
+xx, yy = np.meshgrid(xs,ys)
 
 zz = saddleFun(xx,yy)
 
@@ -208,15 +214,16 @@ fig2=plt.figure()
 ax2 = fig2.add_subplot(111, projection='3d')
 
 ax2.plot_surface(xx, yy, zz)
-ax2.set_xlabel('r'+chSymtoLabel(X))
+ax2.set_xlabel(r'$'+latex(X)+'$')
 ax2.set_xlim(xMin,xMax)
-ax2.set_ylabel('r'+chSymtoLabel(Y))
+ax2.set_ylabel(r'$'+latex(Y)+'$')
 ax2.set_ylim(yMin,yMax)
-ax2.set_zlabel('r'+chSymtoLabel(Z))
+ax2.set_zlabel(r'$'+latex(Z)+'$')
 #ax2.set_zlim(zAxMin,zAxMax)
 plt.show()
 
-from jacobian import computeJac
+from jacobianSalt import computeJac
+from parameterDefaults import defaults
 
 def checkStability(parX,parY,parZ):
     xSym, x = parX
@@ -238,24 +245,30 @@ def checkStability(parX,parY,parZ):
         return 'stable'
     else: return 'unstable'
 
-#dx = 0.05*(xMax-xMin)
-#dy = 0.05*(yMax-yMin)
 
-#xt = 0.5*(xMax-xMin)
-#yt = 0.5*(yMax-yMin)
+gradNorm = [-saddleFunc.diff(X),-saddleFunc.diff(Y),1]
 
-#zt = saddleFun(xt,yt)
+x1 = random.uniform(xMin,xMax)
+y1 = random.uniform(yMin,yMax)
+
+gradNorm[0] = gradNorm[0].subs([(X,x1),(Y,y1)])
+gradNorm[1] = gradNorm[1].subs([(X,x1),(Y,y1)])
+
+revGradNorm = gradNorm
+revGradNorm[0] *= -1
+revGradNorm[1] *= -1
+p1 = (x1,y1,saddleFun(x1,y1))
+p2 = [a+b for a,b in zip(gradNorm,p1)]
+checkStability((X,p2[0]),(Y,p2[1]),(Z,p2[2]))
+
 
 #res = checkStability((X,xt+dx),(Y,yt+dy),(Z,zt+dx))
 #res2 = checkStability((X,xt+dx),(Y,yt+dy),(Z,zt-dx))
-#xs = [xt+dx,xt+dx]
-#ys = [yt+dy,yt+dy]
-#zs = [zt+dx,zt-dx]
 
 #print((res+' at point'+'('+str(xt+dx)+','+str(yt+dy)+','+str(zt+dx)+')'))
 #print((res2+' at point'+'('+str(xt+dx)+','+str(yt+dy)+','+str(zt-dx)+')')) 
 
-#ax2.scatter(xs,ys,zs)
+#ax2.scatter(xs,ys,zs,color='red')
 
 
 #plt.show()

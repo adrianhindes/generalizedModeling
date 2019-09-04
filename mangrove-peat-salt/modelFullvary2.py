@@ -9,11 +9,9 @@ from numpy import random
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from scipy import stats
-import pandas as pd
-import seaborn as sns
+
 from math import isnan
-from jacobian import computeJac
+from jacobianSalt import computeJac
 from systemTypes import typeNode
 
 # M = mangrove biomass (kg), P = peat soil elevation (mm)
@@ -55,7 +53,6 @@ def pick3():
     picks = [b1,b2,b3]
     random.shuffle(picks)
     return picks
-
 # Must add to 1
 # Mangrove gain
 betaP = random.uniform(0,1,n) # from propagules & established saplings
@@ -90,8 +87,15 @@ r1 = 2
 hydP = random.uniform(-2.0, 0, n)
 # Mangroves
 propM = random.uniform(r0, r1, n) 
-propS = random.uniform(-1, 0.0, n)
+propS = random.uniform(-2, 0.0, n)
 growM = random.uniform(r0, r1, n)
+growS = random.uniform(-1,0.0,n)
+
+evaptM = random.uniform(0,1,n)
+precipEvapt = random.uniform(0,0.5,n)
+
+propPrecip = random.uniform(r0,3,n)
+growPrecip = random.uniform(r0,r1,n)
 
 drownHyd = random.uniform(0.0, 5.0, n)
 drownM = random.uniform(r0, r1, n) 
@@ -119,10 +123,14 @@ subsHyd = random.uniform(r0, r1, n)
 subsP = random.uniform(r0, r1, n)
 
 # Salinity
-inM = random.uniform(r0,r1,n)
-inS = random.uniform(r0, 1, n)
+concS = random.uniform(r0, r1, n) #nonlinear values inferred from Teh 2008
+concEvapt = random.uniform(r0,r1,n)
 
-outS = random.uniform(r0, 1,n)
+concHyd = random.uniform(0.5,3,n)
+    
+decrS = random.uniform(r0,r1,n)
+decrPrecip = random.uniform(r0,r1,n)
+
 
 def stability(eigs):
     # take in vector of eigenvalues
@@ -156,12 +164,16 @@ def schurCohn(lam1,lam2,lam3):
 data = {'alphaM':alphaM,'alphaP':alphaP,'alphaS':alphaS,
         'betaG':betaG,'betaP':betaP,'betaD':betaD,'betaL':betaL,
         'betaA':betaA,'betaR':betaR,'betaE':betaE,
-        'hydP':hydP,'propM':propM,'propS':propS,'growM':growM,
+        'hydP':hydP,'propM':propM,'propS':propS,\
+        'growM':growM,'growS':growS,\
+        'propPrecip':propPrecip,'growPrecip':growPrecip,
         'drownHyd':drownHyd,'drownM':drownM,'stressM':stressM,
         'stressS':stressS,'littM':littM,'accSed':accSed,
         'sedHyd':sedHyd,'accM':accM,'retLitt':retLitt,'retHyd':retHyd,
         'volGrow':volGrow,'volP':volP,'eroM':eroM,'subsM':subsM,
-        'subsHyd':subsHyd,'subsP':subsP,'inS':inS,'inM':inM,'outS':outS}
+        'subsHyd':subsHyd,'subsP':subsP,'concS':concS,
+        'concEvapt':concEvapt,'concHyd':concHyd,'evaptM':evaptM,
+        'decrS':decrS,'decrPrecip':decrPrecip,'precipEvapt':precipEvapt}
 
 eigs = [] #eigenvalue triplets
 eigsV = [] #eigenvector triplets

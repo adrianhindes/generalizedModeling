@@ -115,10 +115,12 @@ retHyd = random.uniform(-2.0, 0.0, n)
 
 volGrow = random.uniform(r0, r1, n)
 volP = random.uniform(r0, r1, n)
+volHyd = random.uniform(r0,r1,n)
+volPrecip = random.uniform(0.5,1,n)
 
 eroM = random.uniform(-3,0, n)
 
-subsM = random.uniform(r0, r1, n)
+subsMort = random.uniform(r0, r1, n)
 subsHyd = random.uniform(r0, r1, n)
 subsP = random.uniform(r0, r1, n)
 
@@ -130,6 +132,9 @@ concHyd = random.uniform(0.5,3,n)
     
 decrS = random.uniform(r0,r1,n)
 decrPrecip = random.uniform(r0,r1,n)
+
+evaptS = random.uniform(-1,0,n)
+evaptM = random.uniform(r0,r1,n)
 
 
 def stability(eigs):
@@ -162,17 +167,17 @@ def schurCohn(lam1,lam2,lam3):
 # Construct dataframe to track parameters and associated eigenvalues
 # Parameters that are varying
 data = {'alphaM':alphaM,'alphaP':alphaP,'alphaS':alphaS,
-        'betaG':betaG,'betaP':betaP,'betaD':betaD,'betaL':betaL,
-        'betaA':betaA,'betaR':betaR,'betaE':betaE,
+        'betaG':betaG,'betaP':betaP,'betaD':betaD,'betaL':betaL,'betaS':betaS,
+        'betaA':betaA,'betaR':betaR,'betaV':betaV,'betaE':betaE,'betaSB':betaSB,
         'hydP':hydP,'propM':propM,'propS':propS,\
         'growM':growM,'growS':growS,\
-        'propPrecip':propPrecip,'growPrecip':growPrecip,
-        'drownHyd':drownHyd,'drownM':drownM,'stressM':stressM,
-        'stressS':stressS,'littM':littM,'accSed':accSed,
-        'sedHyd':sedHyd,'accM':accM,'retLitt':retLitt,'retHyd':retHyd,
-        'volGrow':volGrow,'volP':volP,'eroM':eroM,'subsM':subsM,
-        'subsHyd':subsHyd,'subsP':subsP,'concS':concS,
-        'concEvapt':concEvapt,'concHyd':concHyd,'evaptM':evaptM,
+        'propPrecip':propPrecip,'growPrecip':growPrecip,\
+        'drownHyd':drownHyd,'drownM':drownM,'stressM':stressM,\
+        'stressS':stressS,'littM':littM,'accSed':accSed,\
+        'sedHyd':sedHyd,'accM':accM,'retLitt':retLitt,'retHyd':retHyd,\
+        'volGrow':volGrow,'volP':volP,'volHyd':volHyd,'volPrecip':volPrecip,'eroM':eroM,\
+        'subsMort':subsMort,'subsHyd':subsHyd,'subsP':subsP,'concS':concS,\
+        'concEvapt':concEvapt,'concHyd':concHyd,'evaptM':evaptM,'evaptS':evaptS,\
         'decrS':decrS,'decrPrecip':decrPrecip,'precipEvapt':precipEvapt}
 
 eigs = [] #eigenvalue triplets

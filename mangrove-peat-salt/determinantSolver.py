@@ -61,13 +61,13 @@ params += list(elasMang)
 
 # Peat soils
 elasPeat = sp.symbols('acc_sed, sed_hyd, acc_m, ret_litt, ret_hyd, vol_grow,\
-                      vol_p, ero_m, subs_m, subs_hyd, subs_p')
-accSed, sedHyd, accM, retLitt, retHyd, volGrow, volP, eroM, subsM, subsHyd, subsP = elasPeat
+                      vol_p, ero_m, subs_mort, subs_hyd, subs_p, vol_hyd, vol_precip')
+accSed, sedHyd, accM, retLitt, retHyd, volGrow, volP, eroM, subsMort, subsHyd, subsP,volHyd, volPrecip = elasPeat
 params += list(elasPeat)
 
 # Salinity
-elasSalt = sp.symbols('conc_evapt, conc_hyd, evapt_m, decr_precip, precip_evapt, conc_s, decr_s, hyd_p')
-concEvapt, concHyd, evaptM, decrPrecip, precipEvapt,concS, decrS, hydP = elasSalt
+elasSalt = sp.symbols('conc_evapt, conc_hyd, evapt_m, decr_precip, conc_s, decr_s, hyd_p, evapt_s')
+concEvapt, concHyd, evaptM, decrPrecip,concS, decrS, hydP, evaptS = elasSalt
 params += elasSalt
 
 def chSymtoLabel(sym):
@@ -94,39 +94,57 @@ symDefaults = [(sym,defaults[chSymtoLabel(sym)]) for sym in params]
 
 #########
 #Bifurcation surface parameters
-X = betaS
-Y = hydP
-Z = evaptM
+X = growM
+Y = growS
+Z = concHyd
 
 
 xMin = 0
-xMax = 1
+xMax = 2
 
-yMin = -1
+yMin = -2
 yMax = -0.1
 
-zAxMin = 0.5
-zAxMax = 1
+zAxMin = 0
+zAxMax = 2
 
 
 #########
 # Jacobian components
+mortD = betaD/(betaD+betaS)
+mortS = betaS/(betaD+betaS)
 
-dmdm = betaP*propM +betaG*growM + precipEvapt*evaptM*(betaP*propPrecip+betaG*growPrecip)\
-         -betaS*stressM -betaD*drownM -betaL*littM
+dPropdM = propM+propPrecip*precipEvapt*evaptM
+dGrowdM = growM+growPrecip*precipEvapt*evaptM
+
+dmdm = betaP*dPropdM +betaG*dGrowdM-betaS*stressM -betaD*drownM -betaL*littM
+         
 dmdp = -1*betaD*hydP*drownHyd
-dmds = betaP*propS + betaG*growS -betaS*stressS
 
-dpdm = betaA*accM +betaR*retLitt*littM + betaV*volGrow*growM\
-            -betaE*eroM -betaSB*subsM
-        
-dpdp = hydP*(betaA*accSed*sedHyd + betaR*retHyd-betaSB*subsHyd)\
-            +betaV*volP-betaSB*subsP
-dpds = 0
+dPropdS = propS+propPrecip*precipEvapt*evaptS
+dGrowdS = growS+growPrecip*precipEvapt*evaptS
+
+dmds = betaP*dPropdS + betaG*dGrowdS-betaS*stressS
+
+dVoldM = volGrow*(growM+growPrecip*precipEvapt*evaptM)+volPrecip*precipEvapt*evaptM
+dSubsdM = subsMort*(mortD*drownM+mortS*stressM)
+
+dpdm = betaA*accM +betaR*retLitt*littM + betaV*dVoldM - betaE*eroM -betaSB*dSubsdM
+
+dVoldP = volHyd*hydP+volP
+dSubsdP = subsHyd*hydP + subsP
+            
+dpdp = hydP*(betaA*accSed*sedHyd + betaR*retHyd)+betaV*dVoldP-betaSB*dSubsdP
+
+
+dVoldS = volGrow*(growS+growPrecip*precipEvapt*evaptS)+volPrecip*precipEvapt*evaptS
+dSubsdS = subsMort*(mortS*stressS)
+
+dpds = betaV*dVoldS - betaSB*dSubsdS
     
-dsdm = concEvapt*evaptM - decrPrecip*precipEvapt*evaptM
+dsdm = evaptM*(concEvapt - decrPrecip*precipEvapt)
 dsdp = concHyd*hydP
-dsds = concS - decrS
+dsds = concEvapt*evaptS+concS - decrPrecip*precipEvapt*evaptS-decrS
 
 # Define matrices
 

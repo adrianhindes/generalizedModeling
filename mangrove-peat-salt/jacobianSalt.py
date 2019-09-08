@@ -15,15 +15,19 @@ def computeJac(data):
     betaG = data['betaG']
     betaP = data['betaP']
     
-    betaP = data['betaP']
     betaD = data['betaD']
+    betaS = data['betaS']
     betaL = data['betaL']
     
     betaA = data['betaA']
     betaR = data['betaR']
+    betaV = data['betaV']
+    
     betaE = data['betaE']
+    betaSB = data['betaSB']
     
     hydP = data['hydP']
+    
     propM = data['propM']
     propS = data['propS']
     growS = data['growS']
@@ -31,7 +35,6 @@ def computeJac(data):
     
     propPrecip = data['propPrecip']
     growPrecip = data['growPrecip']
-    
     
     drownHyd = data['drownHyd']
     drownM = data['drownM']
@@ -44,11 +47,14 @@ def computeJac(data):
     accM = data['accM']
     retLitt = data['retLitt']
     retHyd = data['retHyd']
+    
     volGrow = data['volGrow']
     volP = data['volP']
+    volHyd = data['volHyd']
+    volPrecip = data['volPrecip']
     
     eroM = data['eroM']
-    subsM = data['subsM']
+    subsMort = data['subsMort']
     subsHyd = data['subsHyd']
     subsP = data['subsP']
     
@@ -60,34 +66,52 @@ def computeJac(data):
     
     decrS = data['decrS']
     decrPrecip = data['decrPrecip']
-    precipEvapt = data['precipEvapt']
     
+    precipEvapt = data['precipEvapt']
+    evaptM = data['evaptM']
+    evaptS = data['evaptS']
     
     
     # Define Jacobian matrix elements
     # Note syntax here is not strictly correct - dmdm == (dm/dt)/dm
     
-    betaG = 1-betaP
-    betaS = 1-betaD-betaL
     betaSB = 1-betaE
     betaV = 1-betaA-betaR
     
-    precipM = evaptM*precipEvapt
-    
-    dmdm = betaP*(propM + propPrecip*precipM) +betaG*(growM+growPrecip*precipM)\
-            +betaS*stressM -betaD*drownM -betaL*littM
-    dmdp = -1*betaD*hydP*drownHyd
-    dmds = betaP*propS +betaG*growS - betaS*stressS
+    mortD = betaD/(betaD+betaS)
+    mortS = betaS/(betaD+betaS)
 
-    dpdm = betaA*accM +betaR*retLitt*littM + betaV*volGrow*growM\
-            -betaE*eroM -betaSB*subsM
-        
-    dpdp = hydP*(betaA*accSed*sedHyd + betaR*retHyd-betaSB*subsHyd)\
-            +betaV*volP-betaSB*subsP
-    dpds = 0
+    dPropdM = propM+propPrecip*precipEvapt*evaptM
+    dGrowdM = growM+growPrecip*precipEvapt*evaptM
+
+    dmdm = betaP*dPropdM +betaG*dGrowdM-betaS*stressM -betaD*drownM -betaL*littM
+         
+    dmdp = -1*betaD*hydP*drownHyd
+
+    dPropdS = propS+propPrecip*precipEvapt*evaptS
+    dGrowdS = growS+growPrecip*precipEvapt*evaptS
+
+    dmds = betaP*dPropdS + betaG*dGrowdS-betaS*stressS
+
+    dVoldM = volGrow*(growM+growPrecip*precipEvapt*evaptM)+volPrecip*precipEvapt*evaptM
+    dSubsdM = subsMort*(mortD*drownM+mortS*stressM)
     
-    dsdm = concEvapt*evaptM - decrPrecip*precipEvapt*evaptM
+    dpdm = betaA*accM +betaR*retLitt*littM + betaV*dVoldM - betaE*eroM -betaSB*dSubsdM
+
+    dVoldP = volHyd*hydP+volP
+    dSubsdP = subsHyd*hydP + subsP
+            
+    dpdp = hydP*(betaA*accSed*sedHyd + betaR*retHyd)+betaV*dVoldP-betaSB*dSubsdP
+
+
+    dVoldS = volGrow*(growS+growPrecip*precipEvapt*evaptS)+volPrecip*precipEvapt*evaptS
+    dSubsdS = subsMort*(mortS*stressS)
+
+    dpds = betaV*dVoldS - betaSB*dSubsdS
+    
+    dsdm = evaptM*(concEvapt - decrPrecip*precipEvapt)
     dsdp = concHyd*hydP
+    dsds = concEvapt*evaptS+concS - decrPrecip*precipEvapt*evaptS-decrS
     dsds = concS - decrS
     
     # alpha paramater array

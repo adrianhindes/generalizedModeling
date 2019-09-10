@@ -16,8 +16,8 @@ betaG0 = 0.5
 betaP0 = 1-betaG0
 
 # Mangrove loss
-betaD0 = 0.25
-betaS0 = 0.25
+betaD0 = 0.4
+betaS0 = 0.4
 betaL0 = 1-betaD0 - betaS0
 
 # Peat gain
@@ -26,7 +26,7 @@ betaR0 = 0.1
 betaV0 = 1 - betaA0 - betaR0
 
 #Peat loss
-betaE0 = 0.5
+betaE0 = 0.8
 betaSB0 = 1 - betaE0
 
 betas = {'betaG':betaG0, 'betaP':betaP0, 'betaD':betaD0, 'betaS':betaS0, 'betaL':betaL0,
@@ -45,7 +45,7 @@ growS0 = -1
 propPrecip = 2
 growPrecip = 1
 evaptM = 0.5
-precipEvapt = 0.5
+precipBeta = 0.5
 
 drownHyd0 = 2
 drownM0 = 1 
@@ -58,7 +58,7 @@ littM0 = 1.5
 mangs = {'propM':propM0, 'propS':propS0, 'growM':growM0,'growS':growS0, 'drownHyd':drownHyd0, \
          'drownM':drownM0,'stressM':stressM0, 'stressS':stressS0, 'littM':littM0,\
          'propPrecip':propPrecip,'growPrecip':growPrecip,\
-         'evaptM':evaptM,'precipEvapt':precipEvapt}
+         'evaptM':evaptM,'precipBeta':precipBeta}
 
 
 

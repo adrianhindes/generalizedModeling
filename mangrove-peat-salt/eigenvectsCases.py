@@ -9,7 +9,7 @@ from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-from jacobian import computeJac
+from jacobianSalt import computeJac
 from parameterDefaults import defaults as defaults
 from droughtParams import defaults as droughts
 
@@ -18,14 +18,18 @@ from droughtParams import defaults as droughts
 n = 10000
 
 paramLabels = {'alphaM','alphaP','alphaS',
-               'betaP','betaD','betaL',
-        'betaA','betaR','betaE',
-        'hydP','propM','propS','growM',
-        'drownHyd','drownM','stressM',
-        'stressS','littM','accSed',
-        'sedHyd','accM','retLitt','retHyd',
-        'volGrow','volP','eroM','subsM',
-        'subsHyd','subsP','inS','inM','outS'}
+        'betaG','betaP','betaD','betaL','betaS',
+        'betaA','betaR','betaV','betaE','betaSB',
+        'hydP','propM','propS',\
+        'growM','growS',\
+        'propPrecip','growPrecip',\
+        'drownHyd','drownM','stressM',\
+        'stressS','littM','accSed',\
+        'sedHyd','accM','retLitt','retHyd',\
+        'volGrow','volP','volHyd','volPrecip','eroM',\
+        'subsMort','subsHyd','subsP','concS',\
+        'concEvapt','concHyd','evaptM','evaptS',\
+        'decrS','decrPrecip','precipBeta'}
 
 dataEndpoints = {key:(defaults[key],droughts[key]) for key in paramLabels}
 data = {k:np.linspace(v[0],v[1],n) for (k,v) in dataEndpoints.items()}
@@ -83,7 +87,7 @@ for j in tqdm(range(n)):
 
 
 
-from modelFullvary import maxStable, minStable
+from modelFullvary2 import maxStable, minStable
 
 scenarioParams = set(['betaG','betaD','betaS','betaA','betaR',
                   'betaE','hydP','drownHyd','drownM'])
@@ -141,6 +145,7 @@ p1 = plt.figure()
 plt.plot(eigs, label = 'Scenario')
 plt.plot(eigsStable, label = 'Scenario w stable parameters')
 plt.plot(eigsUnstable, label = 'Scenario w unstable parameters')
+plt.legend(loc='best')
 #plt.legend(loc='best')
 
 plt.title('Maximum eigenvalue from default to drought & low sea-level')

@@ -92,7 +92,7 @@ growM = random.uniform(r0, r1, n)
 growS = random.uniform(-1,0.0,n)
 
 evaptM = random.uniform(0,1,n)
-precipEvapt = random.uniform(0,0.5,n)
+precipBeta = random.uniform(0,1,n)
 
 propPrecip = random.uniform(r0,3,n)
 growPrecip = random.uniform(r0,r1,n)
@@ -101,18 +101,18 @@ drownHyd = random.uniform(0.0, 5.0, n)
 drownM = random.uniform(r0, r1, n) 
 
 stressM = random.uniform(r0, r1, n)
-stressS = random.uniform(0.0, 2.0, n)
+stressS = random.uniform(0.0, 5.0, n)
 
 littM = random.uniform(1, 2, n)
 
 # Peat soils
 accSed = random.uniform(r0, r1, n) 
-sedHyd = random.uniform(0.5, 4, n)
+sedHyd = random.uniform(0.5, 1, n)
 accM = random.uniform(r0, r1, n)
 
 retLitt = random.uniform(r0, r1, n)
 retHyd = random.uniform(-2.0, 0.0, n)
-
+    
 volGrow = random.uniform(r0, r1, n)
 volP = random.uniform(r0, r1, n)
 volHyd = random.uniform(r0,r1,n)
@@ -120,9 +120,9 @@ volPrecip = random.uniform(0.5,1,n)
 
 eroM = random.uniform(-3,0, n)
 
-subsMort = random.uniform(r0, r1, n)
+subsMort = random.uniform(r0, 4, n)
 subsHyd = random.uniform(r0, r1, n)
-subsP = random.uniform(r0, r1, n)
+subsP = random.uniform(0.5,1, n)
 
 # Salinity
 concS = random.uniform(r0, r1, n) #nonlinear values inferred from Teh 2008
@@ -133,7 +133,7 @@ concHyd = random.uniform(0.5,3,n)
 decrS = random.uniform(r0,r1,n)
 decrPrecip = random.uniform(r0,r1,n)
 
-evaptS = random.uniform(-1,0,n)
+evaptS = random.uniform(-3,-0.5,n)
 evaptM = random.uniform(r0,r1,n)
 
 
@@ -178,9 +178,10 @@ data = {'alphaM':alphaM,'alphaP':alphaP,'alphaS':alphaS,
         'volGrow':volGrow,'volP':volP,'volHyd':volHyd,'volPrecip':volPrecip,'eroM':eroM,\
         'subsMort':subsMort,'subsHyd':subsHyd,'subsP':subsP,'concS':concS,\
         'concEvapt':concEvapt,'concHyd':concHyd,'evaptM':evaptM,'evaptS':evaptS,\
-        'decrS':decrS,'decrPrecip':decrPrecip,'precipEvapt':precipEvapt}
+        'decrS':decrS,'decrPrecip':decrPrecip,'precipBeta':precipBeta}
 
 eigs = [] #eigenvalue triplets
+eigMax = [] # max Eigenvalue list
 eigsV = [] #eigenvector triplets
 stab = [] #stability (0,1)
 determ = [] # determinant of Jacobian
@@ -198,6 +199,7 @@ for j in tqdm(range(n)):
     lamCoff = -0.5*(tr**2-np.trace(j2))
     
     eigs.append(w)
+    eigMax.append(np.real(np.max(w)))
     eigsV.append(v)
     stab.append(stability(w))
     

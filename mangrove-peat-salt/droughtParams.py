@@ -39,8 +39,14 @@ betas = {'betaG':betaG0, 'betaP':betaP0, 'betaD':betaD0, 'betaS':betaS0, 'betaL'
 
 # Mangroves
 propM0 = 1 
-propS0 = -1
+propS0 = -3
 growM0 = 1
+growS0 = -2
+
+propPrecip = 2
+growPrecip = 1
+evaptM = 0.1
+precipBeta = 0.1
 
 drownHyd0 = 0
 drownM0 = 0
@@ -50,8 +56,10 @@ stressS0 = 2
 
 littM0 = 1.5
 
-mangs = {'propM':propM0, 'propS':propS0, 'growM':growM0, 'drownHyd':drownHyd0, 'drownM':drownM0,
-         'stressM':stressM0, 'stressS':stressS0, 'littM':littM0}
+mangs = {'propM':propM0, 'propS':propS0, 'growM':growM0,'growS':growS0, 'drownHyd':drownHyd0, \
+         'drownM':drownM0,'stressM':stressM0, 'stressS':stressS0, 'littM':littM0,\
+         'propPrecip':propPrecip,'growPrecip':growPrecip,\
+         'evaptM':evaptM,'precipBeta':precipBeta}
 
 # Peat soils
 accSed0 = 1 
@@ -63,24 +71,35 @@ retHyd0 = -1
 
 volGrow0 = 1
 volP0 = 1
+volHyd0 = 1
+volPrecip = 0.1
+
 
 eroM0 = 1
 
-subsM0 = 1
+subsMort0 = 2
 subsHyd0 = 1
 subsP0 = 0.5
 
 hydP0 = -0.1
 
-peats = {'accSed':accSed0, 'sedHyd':sedHyd0, 'accM':accM0, 'retLitt':retLitt0, 'retHyd':retHyd0, 'volGrow':volGrow0,
-         'volP':volP0, 'eroM':eroM0, 'subsM':subsM0, 'subsHyd':subsHyd0, 'subsP':subsP0, 'hydP':hydP0}
 
+peats = {'accSed':accSed0, 'sedHyd':sedHyd0, 'accM':accM0,\
+         'retLitt':retLitt0, 'retHyd':retHyd0, 'volGrow':volGrow0,
+         'volP':volP0,'volPrecip':volPrecip, 'eroM':eroM0, 'subsMort':subsMort0,\
+         'subsHyd':subsHyd0, 'subsP':subsP0, 'hydP':hydP0,'volHyd':volHyd0}
 # Salinity
-inM0 = 1.0 
-inS0 = 0.5
+concEvapt = 1.0
+concS = 1.5
+concHyd = 0.5
 
-outS0 = 1
+decrS = 0.5
+decrPrecip = 1.5
 
-salts = {'inM':inM0, 'inS':inS0, 'outS':outS0}
- 
+evaptS = -2
+evaptM = 0.5
+
+salts = {'concEvapt':concEvapt,'concHyd':concHyd, 'concS':concS, 'decrS':decrS,
+         'decrPrecip':decrPrecip,'evaptS':evaptS}
+
 defaults = {**alphas, **betas, **mangs, **peats, **salts}

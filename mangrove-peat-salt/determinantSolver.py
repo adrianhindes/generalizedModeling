@@ -15,7 +15,8 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 from parameterDefaults import defaults
-
+from parameterRanges import ranges
+from jacobianSalt import computeJac
 #sp.init_printing() # Make symbolic expressions look nice
 
 # Bifurcation surface parameters
@@ -54,9 +55,9 @@ params += list(betasPeat)
 # Mangrove Elasticity
 elasMang = sp.symbols('grow_m, grow_s, prop_m, prop_s, drown_hyd, drown_m,\
                       stress_m, stress_s,litt_m, \
-                      prop_precip, grow_precip, precip_evapt')
+                      prop_precip, grow_precip, precip_beta')
 growM, growS, propM, propS, drownHyd, drownM, stressM, stressS, littM,\
-                     propPrecip, growPrecip, precipEvapt = elasMang
+                     propPrecip, growPrecip, precipBeta = elasMang
 params += list(elasMang)
 
 # Peat soils
@@ -94,19 +95,22 @@ symDefaults = [(sym,defaults[chSymtoLabel(sym)]) for sym in params]
 
 #########
 #Bifurcation surface parameters
-X = growM
-Y = growS
-Z = concHyd
+# Top correlation parameters to check
+# hydP, decrS, betaA, betaSB, concEvapt, evaptM
+# concS, betaE, betaV
+X = betaSB
+Y = growM
+Z = betaV
 
 
-xMin = 0
-xMax = 2
+xMin = ranges[chSymtoLabel(X)][0]
+xMax = ranges[chSymtoLabel(X)][1]
 
-yMin = -2
-yMax = -0.1
+yMin = ranges[chSymtoLabel(Y)][0]
+yMax = ranges[chSymtoLabel(Y)][1]
 
-zAxMin = 0
-zAxMax = 2
+zAxMin = ranges[chSymtoLabel(Z)][0]
+zAxMax = ranges[chSymtoLabel(Z)][1]
 
 
 #########
@@ -114,19 +118,19 @@ zAxMax = 2
 mortD = betaD/(betaD+betaS)
 mortS = betaS/(betaD+betaS)
 
-dPropdM = propM+propPrecip*precipEvapt*evaptM
-dGrowdM = growM+growPrecip*precipEvapt*evaptM
+dPropdM = propM+propPrecip*precipBeta*evaptM
+dGrowdM = growM+growPrecip*precipBeta*evaptM
 
 dmdm = betaP*dPropdM +betaG*dGrowdM-betaS*stressM -betaD*drownM -betaL*littM
          
 dmdp = -1*betaD*hydP*drownHyd
 
-dPropdS = propS+propPrecip*precipEvapt*evaptS
-dGrowdS = growS+growPrecip*precipEvapt*evaptS
+dPropdS = propS+propPrecip*precipBeta*evaptS
+dGrowdS = growS+growPrecip*precipBeta*evaptS
 
 dmds = betaP*dPropdS + betaG*dGrowdS-betaS*stressS
 
-dVoldM = volGrow*(growM+growPrecip*precipEvapt*evaptM)+volPrecip*precipEvapt*evaptM
+dVoldM = volGrow*(growM+growPrecip*precipBeta*evaptM)+volPrecip*precipBeta*evaptM
 dSubsdM = subsMort*(mortD*drownM+mortS*stressM)
 
 dpdm = betaA*accM +betaR*retLitt*littM + betaV*dVoldM - betaE*eroM -betaSB*dSubsdM
@@ -137,14 +141,14 @@ dSubsdP = subsHyd*hydP + subsP
 dpdp = hydP*(betaA*accSed*sedHyd + betaR*retHyd)+betaV*dVoldP-betaSB*dSubsdP
 
 
-dVoldS = volGrow*(growS+growPrecip*precipEvapt*evaptS)+volPrecip*precipEvapt*evaptS
+dVoldS = volGrow*(growS+growPrecip*precipBeta*evaptS)+volPrecip*precipBeta*evaptS
 dSubsdS = subsMort*(mortS*stressS)
 
 dpds = betaV*dVoldS - betaSB*dSubsdS
     
-dsdm = evaptM*(concEvapt - decrPrecip*precipEvapt)
+dsdm = evaptM*(concEvapt - decrPrecip*precipBeta)
 dsdp = concHyd*hydP
-dsds = concEvapt*evaptS+concS - decrPrecip*precipEvapt*evaptS-decrS
+dsds = concEvapt*evaptS+concS - decrPrecip*precipBeta*evaptS-decrS
 
 # Define matrices
 
@@ -231,17 +235,22 @@ zz = saddleFun(xx,yy)
 fig2=plt.figure()
 ax2 = fig2.add_subplot(111, projection='3d')
 
+for i in range(len(xx)):
+    for j in range(len(yy)):
+        if (zz[j,i] < zAxMin) or (zz[j,i] > zAxMax):
+            zz[j,i] = np.nan
+            
 ax2.plot_surface(xx, yy, zz)
 ax2.set_xlabel(r'$'+latex(X)+'$')
 ax2.set_xlim(xMin,xMax)
 ax2.set_ylabel(r'$'+latex(Y)+'$')
 ax2.set_ylim(yMin,yMax)
 ax2.set_zlabel(r'$'+latex(Z)+'$')
-#ax2.set_zlim(zAxMin,zAxMax)
+plt.title(r'Bifurcation Surface of $('+latex(X)+','+latex(Y)+','+latex(Z)+')$')
+ax2.set_zlim(zAxMin,zAxMax)
 plt.show()
 
-from jacobianSalt import computeJac
-from parameterDefaults import defaults
+
 
 def checkStability(parX,parY,parZ):
     xSym, x = parX

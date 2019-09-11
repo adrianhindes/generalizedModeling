@@ -90,7 +90,7 @@ for j in tqdm(range(n)):
 from modelFullvary2 import maxStable, minStable
 
 scenarioParams = set(['betaG','betaD','betaS','betaA','betaR',
-                  'betaE','hydP','drownHyd','drownM'])
+                  'betaE','hydP','drownHyd','drownM','concS','decrS'])
     
 maxStable = {k:v for (k,v) in maxStable.items() if k not in scenarioParams}
 minStable = {k:v for (k,v) in minStable.items() if k not in scenarioParams}

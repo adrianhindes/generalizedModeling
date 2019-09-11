@@ -90,10 +90,10 @@ peats = {'accSed':accSed0, 'sedHyd':sedHyd0, 'accM':accM0,\
          'subsHyd':subsHyd0, 'subsP':subsP0, 'hydP':hydP0,'volHyd':volHyd0}
 # Salinity
 concEvapt = 1.0
-concS = 1.5
+concS = 0.5
 concHyd = 0.5
 
-decrS = 0.5
+decrS = 1.5
 decrPrecip = 1.5
 
 evaptS = -2

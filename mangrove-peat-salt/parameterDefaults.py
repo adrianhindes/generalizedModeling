@@ -90,7 +90,7 @@ peats = {'accSed':accSed0, 'sedHyd':sedHyd0, 'accM':accM0,\
 
 # Salinity
 concEvapt = 1.0 
-concS = 1.5
+concS = 0.8
 concHyd = 1
 
 decrS = 0.5

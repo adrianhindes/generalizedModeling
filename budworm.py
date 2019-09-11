@@ -17,6 +17,10 @@ def y2(x):
     y = x/(1+x**2)
     return y
 
+def potent(x,r,k):
+    y = 1/(3*k)*x**3 - (r/2)*x**2 + x - np.arctan(x)
+    return y
+
 n = 1000
 xs = np.linspace(0,10,n)
 
@@ -25,6 +29,10 @@ c1 = y2(xs)
 c2 = y1(xs,0.3,10)
 c3 = y1(xs,0.38,10)
 c4 = y1(xs,0.5,10)
+
+p = potent(xs,0.4,10)
+plt.plot(xs,p)
+
 
 #plt.plot(xs,c1)
 #plt.plot(xs,c2)
@@ -68,10 +76,10 @@ X,R = np.meshgrid(xs,rs)
 
 K = model(X,R)
 
-fig3=plt.figure()
-ax2 = fig3.add_subplot(111, projection='3d')
+#fig3=plt.figure()
+#ax2 = fig3.add_subplot(111, projection='3d')
 
-ax2.plot_surface(K, R, X)
+#ax2.plot_surface(K, R, X)
 
 
  

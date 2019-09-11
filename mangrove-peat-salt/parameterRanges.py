@@ -37,7 +37,6 @@ propS = (-2.0,0)
 growM = (r0, r1)
 growS = (-1,0.0)
 
-evaptM = (0,1)
 precipBeta = (0,1)
 
 propPrecip = (r0,3)
@@ -68,7 +67,7 @@ eroM = (-3,0)
 
 subsMort = (r0, 4)
 subsHyd = (r0, r1)
-subsP = (0.5,1)
+subsP = (r0,r1)
 
 # Salinity
 concS = (r0, r1) #nonlinear values inferred from Teh 2008
@@ -81,6 +80,8 @@ decrPrecip = (r0,r1)
 
 evaptS = (-3,-0.5)
 evaptM = (r0,r1)
+
+
 mangs = {'propM':propM, 'propS':propS, 'growM':growM,'growS':growS, 'drownHyd':drownHyd, \
          'drownM':drownM,'stressM':stressM, 'stressS':stressS, 'littM':littM,\
          'propPrecip':propPrecip,'growPrecip':growPrecip,\

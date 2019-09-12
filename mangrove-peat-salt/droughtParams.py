@@ -62,8 +62,8 @@ mangs = {'propM':propM0, 'propS':propS0, 'growM':growM0,'growS':growS0, 'drownHy
          'evaptM':evaptM,'precipBeta':precipBeta}
 
 # Peat soils
-accSed0 = 1 
-sedHyd0 = 2
+accSed0 = 1
+sedHyd0 = 1
 accM0 = 1.5
 
 retLitt0 = 1
@@ -71,7 +71,7 @@ retHyd0 = -1
 
 volGrow0 = 1
 volP0 = 1
-volHyd0 = 1
+volHyd0 = 0.1
 volPrecip = 0.1
 
 

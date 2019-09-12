@@ -3,7 +3,7 @@
 Created on Wed Aug 28 23:35:08 2019
 
 @author: Excalibur
-Default values and ranges
+Default (healthy) values and ranges
 for generalised modelling parameters
 """
 alphaM0 = 1/6.
@@ -63,7 +63,7 @@ mangs = {'propM':propM0, 'propS':propS0, 'growM':growM0,'growS':growS0, 'drownHy
 
 
 # Peat soils
-accSed0 = 1 
+accSed0 = 1
 sedHyd0 = 2
 accM0 = 1.5
 

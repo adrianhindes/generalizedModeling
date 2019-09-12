@@ -15,6 +15,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 from parameterDefaults import defaults
+from droughtParams import defaults as drought
 from parameterRanges import ranges
 from jacobianSalt import computeJac
 #sp.init_printing() # Make symbolic expressions look nice
@@ -92,21 +93,21 @@ def chSymtoLabel(sym):
 
 # Tuple list (symbol,default value)
 symDefaults = [(sym,defaults[chSymtoLabel(sym)]) for sym in params]
-
+symDroughts = [(sym,drought[chSymtoLabel(sym)]) for sym in params]
 #########
 #Bifurcation surface parameters
 # Top correlation parameters to check
 # hydP, decrS, betaA, betaSB, concEvapt, evaptM
 # concS, betaE, betaV
-X = betaSB
-Y = growM
-Z = betaV
+X = eroM
+Y = betaE
+Z = accM
 
 
 xMin = ranges[chSymtoLabel(X)][0]
 xMax = ranges[chSymtoLabel(X)][1]
 
-yMin = ranges[chSymtoLabel(Y)][0]
+yMin = ranges[chSymtoLabel(Y)][0]+0.1
 yMax = ranges[chSymtoLabel(Y)][1]
 
 zAxMin = ranges[chSymtoLabel(Z)][0]
@@ -218,17 +219,25 @@ if Y in betaSet:
 
 saddle = sp.Eq(det,0)
 saddleManifold = subit(saddle, symDefaults, [X,Y,Z])
+saddleManifold2 = subit(saddle, symDroughts, [X,Y,Z])
 
 # Surface equation for given X,Y,Z
 saddleFunc = sp.solve(saddleManifold, Z)[0]
+saddleFunc2 = sp.solve(saddleManifold2, Z)[0]
+
 print(str(Z) +'=' + str(saddleFunc))
+print(str(Z) +'=' + str(saddleFunc2))
+
 saddleFun = sp.lambdify((X,Y), saddleFunc)
+saddleFun2 = sp.lambdify((X,Y), saddleFunc2)
+
 xs = np.linspace(xMin,xMax,points)
 ys = np.linspace(yMin,yMax,points)
 
 xx, yy = np.meshgrid(xs,ys)
 
 zz = saddleFun(xx,yy)
+#zz2 = saddleFun2(xx,yy)
 
 
 
@@ -240,7 +249,13 @@ for i in range(len(xx)):
         if (zz[j,i] < zAxMin) or (zz[j,i] > zAxMax):
             zz[j,i] = np.nan
             
-ax2.plot_surface(xx, yy, zz)
+#for i in range(len(xx)):
+#    for j in range(len(yy)):
+#        if (zz2[j,i] < zAxMin) or (zz[j,i] > zAxMax):
+#            zz2[j,i] = np.nan
+            
+ax2.plot_surface(xx, yy, zz, label = 'Default healthy conditions', alpha=0.9, edgecolor='none')
+#ax2.plot_surface(xx, yy, zz2, label='Drought & Low Sea-level Conditions', alpha=0.7, edgecolor='none')
 ax2.set_xlabel(r'$'+latex(X)+'$')
 ax2.set_xlim(xMin,xMax)
 ax2.set_ylabel(r'$'+latex(Y)+'$')
@@ -248,7 +263,9 @@ ax2.set_ylim(yMin,yMax)
 ax2.set_zlabel(r'$'+latex(Z)+'$')
 plt.title(r'Bifurcation Surface of $('+latex(X)+','+latex(Y)+','+latex(Z)+')$')
 ax2.set_zlim(zAxMin,zAxMax)
+#ax2.legend()
 plt.show()
+
 
 
 

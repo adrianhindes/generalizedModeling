@@ -51,9 +51,9 @@ stressS = (0.0, 5.0)
 littM = (1, 2)
 
 # Peat soils
-accSed = (r0, r1) 
-sedHyd = (0.5, 1)
-accM = (r0, r1)
+accSed = (0, 1) 
+sedHyd = (r0, r1)
+accM = (0, r1)
 
 retLitt = (r0, r1)
 retHyd = (-2.0, 0.0)

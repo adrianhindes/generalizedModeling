@@ -7,18 +7,19 @@ Default values and ranges
 for generalised modelling parameters
 scenario: drought (less precipitation) and abnormally low sea levels
 """
-alphaM0 = 1/6.
-alphaP0 = 1/3.
-alphaS0 = 6.
+
+alphaM0 = 1/2
+alphaP0 = 1/4
+alphaS0 = 1
 
 alphas = {'alphaM':alphaM0, 'alphaP':alphaP0, 'alphaS':alphaS0}
 #Mangrove Gain
-betaG0 = 0.2
+betaG0 = 0.4
 betaP0 = 1-betaG0
 
 # Mangrove loss
-betaD0 = 0.01
-betaS0 = 0.9
+betaD0 = 0.0
+betaS0 = 0.8
 betaL0 = 1-betaD0 - betaS0
 
 # Peat gain
@@ -38,23 +39,25 @@ betas = {'betaG':betaG0, 'betaP':betaP0, 'betaD':betaD0, 'betaS':betaS0, 'betaL'
 # ----------------------
 
 # Mangroves
-propM0 = 1 
+propM0 = 0.5 
 propS0 = -3
-growM0 = 1
+growM0 = 0.1
 growS0 = -2
 
-propPrecip = 2
-growPrecip = 1
-evaptM = 0.1
-precipBeta = 0.1
 
-drownHyd0 = 0
-drownM0 = 0
+propPrecip = 1.5
+growPrecip = 1
+evaptM = 0.2
+precipBeta = 0.2
+
+drownHyd0 = 0.5
+drownM0 = 1
 
 stressM0 = 1
-stressS0 = 2
+stressS0 = 0.5
 
-littM0 = 1.5
+littM0 = 1
+
 
 mangs = {'propM':propM0, 'propS':propS0, 'growM':growM0,'growS':growS0, 'drownHyd':drownHyd0, \
          'drownM':drownM0,'stressM':stressM0, 'stressS':stressS0, 'littM':littM0,\
@@ -67,7 +70,7 @@ sedHyd0 = 1
 accM0 = 1.5
 
 retLitt0 = 1
-retHyd0 = -1
+retHyd0 = -0.5
 
 volGrow0 = 1
 volP0 = 1
@@ -75,11 +78,11 @@ volHyd0 = 0.1
 volPrecip = 0.1
 
 
-eroM0 = 1
+eroM0 = -1.5
 
 subsMort0 = 2
-subsHyd0 = 1
-subsP0 = 0.5
+subsHyd0 = 0
+subsP0 = 1
 
 hydP0 = -0.1
 
@@ -103,3 +106,21 @@ salts = {'concEvapt':concEvapt,'concHyd':concHyd, 'concS':concS, 'decrS':decrS,
          'decrPrecip':decrPrecip,'evaptS':evaptS}
 
 defaults = {**alphas, **betas, **mangs, **peats, **salts}
+
+"""
+def stability(eigs):
+    # take in vector of eigenvalues
+    # tell if system stable or not (stable if all eigenvalues are less than zero)
+    reals = np.real(eigs)
+    if max(reals) < 0:
+        result = "Stable"
+    else:
+        result = "Unstable"
+    return result
+
+J = computeJac(defaults)
+w, v = LA.eig(J)
+print(J)
+print(np.real(np.max(w)))
+print(stability(w))
+"""

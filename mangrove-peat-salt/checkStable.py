@@ -10,7 +10,7 @@ Guesstimations 2
 alphaM0 = 1/1.3
 alphaP0 = 7.
 alphaS0 = 5
-
+Check Stability of default values
 
 """
 import numpy.linalg as LA
@@ -23,21 +23,21 @@ alphaS0 = 1
 
 alphas = {'alphaM':alphaM0, 'alphaP':alphaP0, 'alphaS':alphaS0}
 #Mangrove Gain
-betaG0 = 0.6
+betaG0 = 0.5
 betaP0 = 1-betaG0
 
 # Mangrove loss
-betaD0 = 0.1
-betaS0 = 0.1
+betaD0 = 0.2
+betaS0 = 0.2
 betaL0 = 1-betaD0 - betaS0
 
 # Peat gain
-betaA0 = 0.7
-betaR0 = 0.05
+betaA0 = 0.6
+betaR0 = 0.1
 betaV0 = 1 - betaA0 - betaR0
 
 #Peat loss
-betaE0 = 0.2
+betaE0 = 0.5
 betaSB0 = 1 - betaE0
 
 betas = {'betaG':betaG0, 'betaP':betaP0, 'betaD':betaD0, 'betaS':betaS0, 'betaL':betaL0,
@@ -48,23 +48,23 @@ betas = {'betaG':betaG0, 'betaP':betaP0, 'betaD':betaD0, 'betaS':betaS0, 'betaL'
 # ----------------------
 
 # Mangroves
-propM0 = 1
-propS0 = -1.5
-growM0 = 0.3
+propM0 = 1 
+propS0 = -2
+growM0 = 1
 growS0 = -1
 
-propPrecip = 1.5
+propPrecip = 2
 growPrecip = 1
-evaptM = 0.8
+evaptM = 0.5
 precipBeta = 0.5
 
-drownHyd0 = 0.5
-drownM0 = 1
+drownHyd0 = 1.5
+drownM0 = 1 
 
 stressM0 = 1
-stressS0 = 0.5
+stressS0 = 2
 
-littM0 = 1
+littM0 = 1.5
 
 mangs = {'propM':propM0, 'propS':propS0, 'growM':growM0,'growS':growS0, 'drownHyd':drownHyd0, \
          'drownM':drownM0,'stressM':stressM0, 'stressS':stressS0, 'littM':littM0,\
@@ -83,10 +83,10 @@ retHyd0 = -1
 
 volGrow0 = 1
 volP0 = 1
-volHyd0 = 1.5
+volHyd0 = 1
 volPrecip = 0.5
 
-eroM0 = -1.5
+eroM0 = -1
 
 subsMort0 = 1.5
 subsHyd0 = 1
@@ -100,11 +100,11 @@ peats = {'accSed':accSed0, 'sedHyd':sedHyd0, 'accM':accM0,\
          'subsHyd':subsHyd0, 'subsP':subsP0, 'hydP':hydP0,'volHyd':volHyd0}
 
 # Salinity
-concEvapt = 1.0 
-concS = 1
+concEvapt = 0.7
+concS = 0.8
 concHyd = 1
 
-decrS = 1
+decrS = 0.5
 decrPrecip = 1
 
 evaptS = -1
@@ -128,5 +128,5 @@ def stability(eigs):
 J = computeJac(defaults)
 w, v = LA.eig(J)
 print(J)
-print(np.real(np.max(w)))
+print(np.max(w))
 print(stability(w))

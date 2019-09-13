@@ -18,16 +18,20 @@ from systemTypes import typeNode
 # S = soil salinity (ppm?)
 
 # Linspace range
-n = 10000
+n = 500000
 
 # ---------------
 # Timescales
 # ---------------
 # 1/years turnover rates
 # total guesses at the moment
-alphaM = random.uniform(1/6,1/6,n)
-alphaP = random.uniform(1/3,1/3,n)
-alphaS = random.uniform(3,3,n)
+mangLifespan= 2 # average leaf lifespan
+unitPeatTime = 1 # how long does a chunk of peat topsoil last?
+unitSaltTime = 1 # timescale for unit of salt
+
+alphaM = random.uniform(1/mangLifespan,1/mangLifespan,n)
+alphaP = random.uniform(1/unitPeatTime,1/unitPeatTime,n)
+alphaS = random.uniform(1/unitSaltTime,1/unitSaltTime,n)
 
 paramLabels = {'alphaM','alphaP','alphaS',
                'betaP','betaD','betaL',
@@ -103,7 +107,7 @@ drownM = random.uniform(r0, r1, n)
 stressM = random.uniform(r0, r1, n)
 stressS = random.uniform(0.0, 5.0, n)
 
-littM = random.uniform(1, 2, n)
+littM = random.uniform(r0, r1, n)
 
 # Peat soils
 accSed = random.uniform(r0, r1, n) 

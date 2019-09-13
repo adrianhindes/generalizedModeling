@@ -94,26 +94,35 @@ def chSymtoLabel(sym):
 # Tuple list (symbol,default value)
 symDefaults = [(sym,defaults[chSymtoLabel(sym)]) for sym in params]
 symDroughts = [(sym,drought[chSymtoLabel(sym)]) for sym in params]
-#########
+
+
+############
+#----------#
+############
+
 #Bifurcation surface parameters
 # Top correlation parameters to check
 # hydP, decrS, betaA, betaSB, concEvapt, evaptM
 # concS, betaE, betaV
-X = eroM
-Y = betaE
-Z = accM
+X = propPrecip
+Y = propS
+Z = stressS
 
+showDrought = False
+############
+#----------#
+############
 
 xMin = ranges[chSymtoLabel(X)][0]
 xMax = ranges[chSymtoLabel(X)][1]
 
-yMin = ranges[chSymtoLabel(Y)][0]+0.1
+yMin = ranges[chSymtoLabel(Y)][0]
 yMax = ranges[chSymtoLabel(Y)][1]
 
 zAxMin = ranges[chSymtoLabel(Z)][0]
 zAxMax = ranges[chSymtoLabel(Z)][1]
 
-
+truncate = True
 #########
 # Jacobian components
 mortD = betaD/(betaD+betaS)
@@ -237,33 +246,44 @@ ys = np.linspace(yMin,yMax,points)
 xx, yy = np.meshgrid(xs,ys)
 
 zz = saddleFun(xx,yy)
-#zz2 = saddleFun2(xx,yy)
+zz2 = saddleFun2(xx,yy)
 
 
 
 fig2=plt.figure()
 ax2 = fig2.add_subplot(111, projection='3d')
 
-for i in range(len(xx)):
-    for j in range(len(yy)):
-        if (zz[j,i] < zAxMin) or (zz[j,i] > zAxMax):
-            zz[j,i] = np.nan
+if truncate == True:
+    for i in range(len(xx)):
+        for j in range(len(yy)):
+            if (zz[j,i] < zAxMin) or (zz[j,i] > zAxMax): zz[j,i] = np.nan
+            if (zz2[j,i] < zAxMin) or (zz2[j,i] > zAxMax): zz2[j,i] = np.nan
             
-#for i in range(len(xx)):
-#    for j in range(len(yy)):
-#        if (zz2[j,i] < zAxMin) or (zz[j,i] > zAxMax):
-#            zz2[j,i] = np.nan
-            
-ax2.plot_surface(xx, yy, zz, label = 'Default healthy conditions', alpha=0.9, edgecolor='none')
-#ax2.plot_surface(xx, yy, zz2, label='Drought & Low Sea-level Conditions', alpha=0.7, edgecolor='none')
+
+        
+s1 = ax2.plot_surface(xx, yy, zz, label = 'Default', alpha=0.9, edgecolor='none')
+
+s1._facecolors2d=s1._facecolors3d
+s1._edgecolors2d=s1._edgecolors3d
+
+if showDrought == True:
+    s2 = ax2.plot_surface(xx, yy, zz2, label='Drought', alpha=0.7, edgecolor='none')
+    s2._facecolors2d=s2._facecolors3d
+    s2._edgecolors2d=s2._edgecolors3d
+    ax2.legend(loc = 'upper right')
+    
 ax2.set_xlabel(r'$'+latex(X)+'$')
 ax2.set_xlim(xMin,xMax)
 ax2.set_ylabel(r'$'+latex(Y)+'$')
 ax2.set_ylim(yMin,yMax)
 ax2.set_zlabel(r'$'+latex(Z)+'$')
 plt.title(r'Bifurcation Surface of $('+latex(X)+','+latex(Y)+','+latex(Z)+')$')
-ax2.set_zlim(zAxMin,zAxMax)
-#ax2.legend()
+
+if truncate == True:
+    ax2.set_zlim(zAxMin,zAxMax)
+    
+
+
 plt.show()
 
 
@@ -291,20 +311,24 @@ def checkStability(parX,parY,parZ):
 
 
 gradNorm = [-saddleFunc.diff(X),-saddleFunc.diff(Y),1]
-
+gradNorm = np.multiply(gradNorm, 1/10)
 x1 = random.uniform(xMin,xMax)
 y1 = random.uniform(yMin,yMax)
 
 gradNorm[0] = gradNorm[0].subs([(X,x1),(Y,y1)])
 gradNorm[1] = gradNorm[1].subs([(X,x1),(Y,y1)])
 
-revGradNorm = gradNorm
-revGradNorm[0] *= -1
-revGradNorm[1] *= -1
+revGradNorm = np.multiply(gradNorm, -1)
+
+
 p1 = (x1,y1,saddleFun(x1,y1))
 p2 = [a+b for a,b in zip(gradNorm,p1)]
-checkStability((X,p2[0]),(Y,p2[1]),(Z,p2[2]))
+p3 = [a+b for a,b in zip(revGradNorm,p1)]
 
+res1 = checkStability((X,p2[0]),(Y,p2[1]),(Z,p2[2]))
+print(res1 + " above" )
+res2 = checkStability((X,p3[0]),(Y,p2[1]),(Z,p3[2]))
+print(res2 + " below")
 
 #res = checkStability((X,xt+dx),(Y,yt+dy),(Z,zt+dx))
 #res2 = checkStability((X,xt+dx),(Y,yt+dy),(Z,zt-dx))

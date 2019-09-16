@@ -82,7 +82,7 @@ retLitt0 = 1
 retHyd0 = -1
 
 volGrow0 = 1
-volP0 = 1
+volP0 = -1
 volHyd0 = 1.5
 volPrecip = 0.5
 
@@ -92,7 +92,7 @@ subsMort0 = 1.5
 subsHyd0 = 1
 subsP0 = 0.5
 
-hydP0 = -0.5
+hydP0 = -1
 
 peats = {'accSed':accSed0, 'sedHyd':sedHyd0, 'accM':accM0,\
          'retLitt':retLitt0, 'retHyd':retHyd0, 'volGrow':volGrow0,

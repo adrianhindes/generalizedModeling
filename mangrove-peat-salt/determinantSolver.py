@@ -104,9 +104,9 @@ symDroughts = [(sym,drought[chSymtoLabel(sym)]) for sym in params]
 # Top correlation parameters to check
 # hydP, decrS, betaA, betaSB, concEvapt, evaptM
 # concS, betaE, betaV
-X = propPrecip
-Y = propS
-Z = stressS
+X = drownHyd
+Y = stressS
+Z = subsMort
 
 showDrought = False
 ############
@@ -122,7 +122,7 @@ yMax = ranges[chSymtoLabel(Y)][1]
 zAxMin = ranges[chSymtoLabel(Z)][0]
 zAxMax = ranges[chSymtoLabel(Z)][1]
 
-truncate = True
+truncate = False
 #########
 # Jacobian components
 mortD = betaD/(betaD+betaS)
@@ -168,11 +168,11 @@ det = jac.det()
 
 # Beta simplifications
 # Require additional assumptions if choosing one of trio betas
-betaL0 = 0.2
-betaS0 = 0.4
+betaL0 = 0.8
+betaS0 = 0.1
 
-betaV0 = 0.2
-betaR0 = 0.2
+betaV0 = 0.25
+betaR0 = 0.05
 
 subG = 1 - betaP
 subP = 1 - betaG
@@ -215,12 +215,10 @@ def fixBetas(expr,beta):
         return expr.subs(betaE,subE)
 
 betaSet = betasMang + betasPeat
-if X in betaSet:
-    det = fixBetas(det,X)
-if Y in betaSet:
-    det = fixBetas(det,Y)
-    
 
+if X in betaSet: det = fixBetas(det,X)
+if Y in betaSet: det = fixBetas(det,Y)
+        
 #det.subs(betaG, subG)
 #det.subs(betaL,subL)
 #det.subs(betaV,subV)

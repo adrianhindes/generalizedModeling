@@ -18,30 +18,19 @@ from systemTypes import typeNode
 # S = soil salinity (ppm?)
 
 # Linspace range
-n = 500000
+n = 100000
 
 # ---------------
 # Timescales
 # ---------------
-# 1/years turnover rates
-# total guesses at the moment
-mangLifespan= 2 # average leaf lifespan
-unitPeatTime = 1 # how long does a chunk of peat topsoil last?
-unitSaltTime = 1 # timescale for unit of salt
+
+mangLifespan= 3 # average leaf lifespan
+unitPeatTime = 0.5 # how long does a chunk of peat topsoil last? https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010WR009492
+unitSaltTime = 0.5 # timescale for unit of salt https://link.springer.com/article/10.1023/A:1008470719913
 
 alphaM = random.uniform(1/mangLifespan,1/mangLifespan,n)
 alphaP = random.uniform(1/unitPeatTime,1/unitPeatTime,n)
 alphaS = random.uniform(1/unitSaltTime,1/unitSaltTime,n)
-
-paramLabels = {'alphaM','alphaP','alphaS',
-               'betaP','betaD','betaL',
-        'betaA','betaR','betaE',
-        'hydP','propM','propS','growM',
-        'drownHyd','drownM','stressM',
-        'stressS','littM','accSed',
-        'sedHyd','accM','retLitt','retHyd',
-        'volGrow','volP','eroM','subsM',
-        'subsHyd','subsP','inS','inM','outS'}
 
 # ----------------
 # Beta parameters
@@ -57,6 +46,7 @@ def pick3():
     picks = [b1,b2,b3]
     random.shuffle(picks)
     return picks
+
 # Must add to 1
 # Mangrove gain
 betaP = random.uniform(0,1,n) # from propagules & established saplings
@@ -91,12 +81,12 @@ r1 = 2
 hydP = random.uniform(-2.0, 0, n)
 # Mangroves
 propM = random.uniform(r0, r1, n) 
-propS = random.uniform(-2, 0.0, n)
-growM = random.uniform(r0, r1, n)
-growS = random.uniform(-1,0.0,n)
+propS = random.uniform(-3, 0.0, n)
+growM = random.uniform(0, 1, n)
+growS = random.uniform(-2,0.0,n)
 
 evaptM = random.uniform(0,1,n)
-precipBeta = random.uniform(0,1,n)
+precipBeta = random.uniform(0,0.3,n) #https://journals.ametsoc.org/doi/abs/10.1175/1520-0442%281993%29006%3C1077%3AEOCPR%3E2.0.CO%3B2
 
 propPrecip = random.uniform(r0,3,n)
 growPrecip = random.uniform(r0,r1,n)
@@ -118,7 +108,7 @@ retLitt = random.uniform(r0, r1, n)
 retHyd = random.uniform(-2.0, 0.0, n)
     
 volGrow = random.uniform(r0, r1, n)
-volP = random.uniform(r0, r1, n)
+volP = random.uniform(-2, -0.5, n)
 volHyd = random.uniform(r0,r1,n)
 volPrecip = random.uniform(0.5,1,n)
 
@@ -137,7 +127,7 @@ concHyd = random.uniform(0.5,3,n)
 decrS = random.uniform(r0,r1,n)
 decrPrecip = random.uniform(r0,r1,n)
 
-evaptS = random.uniform(-3,-0.5,n)
+evaptS = random.uniform(-2,0,n)
 evaptM = random.uniform(r0,r1,n)
 
 
@@ -233,7 +223,7 @@ for typ in set(typeList):
 corrs = {k:(np.corrcoef(data[k],stab)[0,1]) for (k,v) in data.items() }
 
 #Sort out only the big correlations
-numPlot = 15 # number of variables to plot
+numPlot = 7 # number of variables to plot
 remNum = len(corrs.items()) - numPlot #number of variables to remove
 absCorrs = {k: np.abs(v) for (k,v) in corrs.items() if not isnan(v)}
 corrsSorted = sorted(absCorrs.items(), key=lambda x: x[1], reverse=True)

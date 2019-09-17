@@ -23,14 +23,22 @@ n = 100000
 # ---------------
 # Timescales
 # ---------------
+#years
+alphaM0 = 3/12
+alphaM1 = 2
 
-mangLifespan= 3 # average leaf lifespan
-unitPeatTime = 0.5 # how long does a chunk of peat topsoil last? https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010WR009492
+alphaP0 = 6/12
+alphaP1 = 2
+
+alphaS0 = 6/12
+alphaS1 = 2
+mangLifespan= 4 # average leaf lifespan #https://academic.oup.com/treephys/article/30/9/1148/1641261
+unitPeatTime = 1/2 # how long does a chunk of peat topsoil last? https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010WR009492
 unitSaltTime = 0.5 # timescale for unit of salt https://link.springer.com/article/10.1023/A:1008470719913
 
-alphaM = random.uniform(1/mangLifespan,1/mangLifespan,n)
-alphaP = random.uniform(1/unitPeatTime,1/unitPeatTime,n)
-alphaS = random.uniform(1/unitSaltTime,1/unitSaltTime,n)
+alphaM = random.uniform(alphaM0,alphaM1,n)
+alphaP = random.uniform(alphaP0,alphaP1,n)
+alphaS = random.uniform(alphaS0,alphaS1,n)
 
 # ----------------
 # Beta parameters
@@ -223,7 +231,7 @@ for typ in set(typeList):
 corrs = {k:(np.corrcoef(data[k],stab)[0,1]) for (k,v) in data.items() }
 
 #Sort out only the big correlations
-numPlot = 7 # number of variables to plot
+numPlot = 15 # number of variables to plot
 remNum = len(corrs.items()) - numPlot #number of variables to remove
 absCorrs = {k: np.abs(v) for (k,v) in corrs.items() if not isnan(v)}
 corrsSorted = sorted(absCorrs.items(), key=lambda x: x[1], reverse=True)
@@ -232,14 +240,17 @@ del corrsSorted[-delN:]
 
 bigCorrs = {k: corrs[k] for (k,v) in corrsSorted}
 
-p2 = plt.figure()
+
 plt.bar(range(len(bigCorrs)), bigCorrs.values())
 
-plt.ylabel('Correlation Coefficient')
+plt.ylabel('Pearson Correlation Coefficient')
 plt.xlabel('Parameter')
-plt.xticks(range(len(bigCorrs)), list(bigCorrs.keys()), rotation=70)
+plt.xticks(range(len(bigCorrs)), list(bigCorrs.keys()), rotation=60)
 plt.show()
 
+
+
+'''
 posStable = set() # parameters for which higher values => greater stability
 negStable = set() # parameters for which higher values => lower stability
 
@@ -248,7 +259,6 @@ for (param,corr) in bigCorrs.items():
         posStable.add(param)
     else:
         negStable.add(param)
-        
 
 # For max stability
 maxStable = {}
@@ -262,3 +272,4 @@ for param in negStable:
     maxStable[param] = min(data[param])
     minStable[param] = max(data[param])
     
+'''

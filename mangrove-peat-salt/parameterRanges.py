@@ -9,6 +9,12 @@ Paramater ranges for elasticities
 # Elasticity parameters
 # ----------------------
 
+alphaM = (1/3,2)
+alphaP = (1, 6)
+alphaS = (1/4, 1/2)
+
+alphas = {'alphaM':alphaM, 'alphaP':alphaP, 'alphaS':alphaS}
+
 betaA = (0,1)
 betaR = (0,1)
 betaV = (0,1)
@@ -95,4 +101,4 @@ peats = {'accSed':accSed, 'sedHyd':sedHyd, 'accM':accM,\
 salts = {'concEvapt':concEvapt,'concHyd':concHyd, 'concS':concS, 'decrS':decrS,
          'decrPrecip':decrPrecip,'evaptS':evaptS}
 
-ranges = {**betas, **mangs, **peats, **salts}
+ranges = {**alphas, **betas, **mangs, **peats, **salts}

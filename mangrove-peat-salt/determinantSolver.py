@@ -12,7 +12,7 @@ import sympy as sp
 from sympy.printing import latex
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-
+import sys
 
 from parameterDefaults import defaults
 from droughtParams import defaults as drought
@@ -40,7 +40,9 @@ def subit(expr,defaults,excl):
 
 params = []
 # Timescale parameters
-alphaM, alphaP, alphaS = sp.symbols('alpha_m alpha_p alpha_s')
+alphas = sp.symbols('alpha_m alpha_p alpha_s')
+alphaM, alphaP, alphaS = alphas
+params += list(alphas)
 
 # Mangrove Betas
 
@@ -104,9 +106,15 @@ symDroughts = [(sym,drought[chSymtoLabel(sym)]) for sym in params]
 # Top correlation parameters to check
 # hydP, decrS, betaA, betaSB, concEvapt, evaptM
 # concS, betaE, betaV
-X = drownHyd
-Y = stressS
-Z = subsMort
+
+
+X = stressS
+Y = betaS
+Z = growPrecip
+
+blacklist = [betaP, betaL, betaR] 
+check = [(par in blacklist) for par in [X,Y,Z]]
+if any(check): sys.exit("One or more parameters is an already defined beta")
 
 showDrought = False
 ############
@@ -117,7 +125,7 @@ xMin = ranges[chSymtoLabel(X)][0]
 xMax = ranges[chSymtoLabel(X)][1]
 
 yMin = ranges[chSymtoLabel(Y)][0]
-yMax = ranges[chSymtoLabel(Y)][1]
+yMax = ranges[chSymtoLabel(Y)][1] -0.1
 
 zAxMin = ranges[chSymtoLabel(Z)][0]
 zAxMax = ranges[chSymtoLabel(Z)][1]
@@ -130,6 +138,14 @@ mortS = betaS/(betaD+betaS)
 
 dPropdM = propM+propPrecip*precipBeta*evaptM
 dGrowdM = growM+growPrecip*precipBeta*evaptM
+
+# Beta substitutions
+betaP = 1 - betaG
+betaL = 1 - betaD - betaS
+
+betaR = 1 - betaA - betaV
+betaSB = 1 - betaE
+
 
 dmdm = betaP*dPropdM +betaG*dGrowdM-betaS*stressM -betaD*drownM -betaL*littM
          
@@ -164,87 +180,37 @@ dsds = concEvapt*evaptS+concS - decrPrecip*precipBeta*evaptS-decrS
 
 alphas = sp.Matrix([[alphaM, 0, 0], [0, alphaP, 0], [0, 0, alphaS]])
 jac = sp.Matrix([[dmdm, dmdp, dmds], [dpdm, dpdp, dpds], [dsdm, dsdp, dsds]])
-det = jac.det()
-
-# Beta simplifications
-# Require additional assumptions if choosing one of trio betas
-betaL0 = 0.8
-betaS0 = 0.1
-
-betaV0 = 0.25
-betaR0 = 0.05
-
-subG = 1 - betaP
-subP = 1 - betaG
-
-subD = 1 - betaL0 - betaS
-subS = 1 - betaD - betaL0
-subL = 1 - betaD - betaS
-
-subA = 1 - betaR - betaV0
-subR = 1 - betaA - betaV0
-subV = 1 - betaA - betaR
-
-subE = 1 - betaSB
-subSB = 1 - betaE
+jac2 = alphas*jac
+det = jac2.det()
 
 
-def fixBetas(expr,beta):
-    if beta == betaG:
-        return expr.subs(betaP,subP)
-    elif beta == betaP:
-        return expr.subs(betaG,subG)
-    
-    elif beta == betaD:
-        return expr.subs(betaS,subS)
-    elif beta == betaS:
-        return expr.subs(betaD,subD)
-    elif beta == betaL:
-        return expr.subs(betaD,(1-betaL-betaS0))
-    
-    elif beta == betaA:
-        return expr.subs(betaR,subR)
-    elif beta == betaR:
-        return expr.subs(betaA,subA)
-    elif beta == betaV:
-        return expr.subs(betaA,(1-betaR0-betaV))
-    
-    elif beta == betaE:
-        return expr.subs(betaSB,subSB)
-    elif beta == betaSB:
-        return expr.subs(betaE,subE)
-
-betaSet = betasMang + betasPeat
-
-if X in betaSet: det = fixBetas(det,X)
-if Y in betaSet: det = fixBetas(det,Y)
-        
-#det.subs(betaG, subG)
-#det.subs(betaL,subL)
-#det.subs(betaV,subV)
-#det.subs(betaSB,subSB)
 
 saddle = sp.Eq(det,0)
 saddleManifold = subit(saddle, symDefaults, [X,Y,Z])
-saddleManifold2 = subit(saddle, symDroughts, [X,Y,Z])
+
+
+
+
 
 # Surface equation for given X,Y,Z
 saddleFunc = sp.solve(saddleManifold, Z)[0]
-saddleFunc2 = sp.solve(saddleManifold2, Z)[0]
 
 print(str(Z) +'=' + str(saddleFunc))
-print(str(Z) +'=' + str(saddleFunc2))
 
 saddleFun = sp.lambdify((X,Y), saddleFunc)
-saddleFun2 = sp.lambdify((X,Y), saddleFunc2)
 
 xs = np.linspace(xMin,xMax,points)
 ys = np.linspace(yMin,yMax,points)
 
 xx, yy = np.meshgrid(xs,ys)
-
 zz = saddleFun(xx,yy)
-zz2 = saddleFun2(xx,yy)
+
+if showDrought: 
+    saddleManifold2 = subit(saddle, symDroughts, [X,Y,Z])
+    saddleFunc2 = sp.solve(saddleManifold2, Z)[0]
+    print(str(Z) +'=' + str(saddleFunc2))
+    saddleFun2 = sp.lambdify((X,Y), saddleFunc2)
+    zz2 = saddleFun2(xx,yy)
 
 
 
@@ -259,7 +225,7 @@ if truncate == True:
             
 
         
-s1 = ax2.plot_surface(xx, yy, zz, label = 'Default', alpha=0.9, edgecolor='none')
+s1 = ax2.plot_surface(xx, yy, zz, alpha=0.9, edgecolor='none')
 
 s1._facecolors2d=s1._facecolors3d
 s1._edgecolors2d=s1._edgecolors3d
@@ -277,9 +243,18 @@ ax2.set_ylim(yMin,yMax)
 ax2.set_zlabel(r'$'+latex(Z)+'$')
 plt.title(r'Bifurcation Surface of $('+latex(X)+','+latex(Y)+','+latex(Z)+')$')
 
+# Plot stable parameter triplet from defaults (assuming defaults are stable)
+stX = defaults[chSymtoLabel(X)]
+stY = defaults[chSymtoLabel(Y)]
+stZ = defaults[chSymtoLabel(Z)]
+
+ax2.scatter(stX,stY,stZ, color='red', label = 'Stable config')
+#ax2.legend(loc='lower left')
+
 if truncate == True:
     ax2.set_zlim(zAxMin,zAxMax)
-    
+
+
 
 
 plt.show()
@@ -323,10 +298,10 @@ p1 = (x1,y1,saddleFun(x1,y1))
 p2 = [a+b for a,b in zip(gradNorm,p1)]
 p3 = [a+b for a,b in zip(revGradNorm,p1)]
 
-res1 = checkStability((X,p2[0]),(Y,p2[1]),(Z,p2[2]))
-print(res1 + " above" )
-res2 = checkStability((X,p3[0]),(Y,p2[1]),(Z,p3[2]))
-print(res2 + " below")
+#res1 = checkStability((X,p2[0]),(Y,p2[1]),(Z,p2[2]))
+#print(res1 + " above" )
+#res2 = checkStability((X,p3[0]),(Y,p2[1]),(Z,p3[2]))
+#print(res2 + " below")
 
 #res = checkStability((X,xt+dx),(Y,yt+dy),(Z,zt+dx))
 #res2 = checkStability((X,xt+dx),(Y,yt+dy),(Z,zt-dx))

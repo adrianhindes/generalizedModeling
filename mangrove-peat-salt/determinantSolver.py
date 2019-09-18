@@ -108,9 +108,9 @@ symDroughts = [(sym,drought[chSymtoLabel(sym)]) for sym in params]
 # concS, betaE, betaV
 
 
-X = stressS
-Y = betaS
-Z = growPrecip
+X = sedHyd
+Y = betaA
+Z = subsHyd
 
 blacklist = [betaP, betaL, betaR] 
 check = [(par in blacklist) for par in [X,Y,Z]]
@@ -125,12 +125,12 @@ xMin = ranges[chSymtoLabel(X)][0]
 xMax = ranges[chSymtoLabel(X)][1]
 
 yMin = ranges[chSymtoLabel(Y)][0]
-yMax = ranges[chSymtoLabel(Y)][1] -0.1
+yMax = ranges[chSymtoLabel(Y)][1]-0.1
 
 zAxMin = ranges[chSymtoLabel(Z)][0]
 zAxMax = ranges[chSymtoLabel(Z)][1]
 
-truncate = False
+truncate = True
 #########
 # Jacobian components
 mortD = betaD/(betaD+betaS)
@@ -144,7 +144,7 @@ betaP = 1 - betaG
 betaL = 1 - betaD - betaS
 
 betaR = 1 - betaA - betaV
-betaSB = 1 - betaE
+betaE = 1 - betaSB
 
 
 dmdm = betaP*dPropdM +betaG*dGrowdM-betaS*stressM -betaD*drownM -betaL*littM
@@ -221,7 +221,8 @@ if truncate == True:
     for i in range(len(xx)):
         for j in range(len(yy)):
             if (zz[j,i] < zAxMin) or (zz[j,i] > zAxMax): zz[j,i] = np.nan
-            if (zz2[j,i] < zAxMin) or (zz2[j,i] > zAxMax): zz2[j,i] = np.nan
+            if showDrought:
+                if (zz2[j,i] < zAxMin) or (zz2[j,i] > zAxMax): zz2[j,i] = np.nan
             
 
         

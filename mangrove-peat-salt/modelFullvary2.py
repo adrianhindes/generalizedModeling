@@ -18,7 +18,7 @@ from systemTypes import typeNode
 # S = soil salinity (ppm?)
 
 # Linspace range
-n = 100000
+n = 1000000
 
 # ---------------
 # Timescales
@@ -86,7 +86,7 @@ r0 = 0.5
 r1 = 2
 
 
-hydP = random.uniform(-2.0, 0, n)
+hydP = random.uniform(-1.0, 0, n)
 # Mangroves
 propM = random.uniform(r0, r1, n) 
 propS = random.uniform(-3, 0.0, n)
@@ -231,7 +231,7 @@ for typ in set(typeList):
 corrs = {k:(np.corrcoef(data[k],stab)[0,1]) for (k,v) in data.items() }
 
 #Sort out only the big correlations
-numPlot = 15 # number of variables to plot
+numPlot = 5 # number of variables to plot
 remNum = len(corrs.items()) - numPlot #number of variables to remove
 absCorrs = {k: np.abs(v) for (k,v) in corrs.items() if not isnan(v)}
 corrsSorted = sorted(absCorrs.items(), key=lambda x: x[1], reverse=True)

@@ -30,8 +30,8 @@ alphaM1 = 2
 alphaP0 = 6/12
 alphaP1 = 2
 
-alphaS0 = 6/12
-alphaS1 = 2
+alphaS0 = 50
+alphaS1 = 100
 mangLifespan= 4 # average leaf lifespan #https://academic.oup.com/treephys/article/30/9/1148/1641261
 unitPeatTime = 1/2 # how long does a chunk of peat topsoil last? https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010WR009492
 unitSaltTime = 0.5 # timescale for unit of salt https://link.springer.com/article/10.1023/A:1008470719913

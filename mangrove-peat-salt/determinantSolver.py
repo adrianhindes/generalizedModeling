@@ -108,9 +108,9 @@ symDroughts = [(sym,drought[chSymtoLabel(sym)]) for sym in params]
 # concS, betaE, betaV
 
 
-X = sedHyd
-Y = betaA
-Z = subsHyd
+X = betaS
+Y = stressS
+Z = concHyd
 
 blacklist = [betaP, betaL, betaR] 
 check = [(par in blacklist) for par in [X,Y,Z]]
@@ -174,7 +174,7 @@ dpds = betaV*dVoldS - betaSB*dSubsdS
     
 dsdm = evaptM*(concEvapt - decrPrecip*precipBeta)
 dsdp = concHyd*hydP
-dsds = concEvapt*evaptS+concS - decrPrecip*precipBeta*evaptS-decrS
+dsds = concEvapt*evaptS - decrPrecip*precipBeta*evaptS
 
 # Define matrices
 
@@ -242,7 +242,7 @@ ax2.set_xlim(xMin,xMax)
 ax2.set_ylabel(r'$'+latex(Y)+'$')
 ax2.set_ylim(yMin,yMax)
 ax2.set_zlabel(r'$'+latex(Z)+'$')
-plt.title(r'Bifurcation Surface of $('+latex(X)+','+latex(Y)+','+latex(Z)+')$')
+#plt.title(r'Bifurcation Surface of $('+latex(X)+','+latex(Y)+','+latex(Z)+')$')
 
 # Plot stable parameter triplet from defaults (assuming defaults are stable)
 stX = defaults[chSymtoLabel(X)]

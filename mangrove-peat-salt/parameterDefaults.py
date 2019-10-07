@@ -18,12 +18,12 @@ import numpy as np
 from jacobianSalt import computeJac
 
 alphaM0 = 1/2
-alphaP0 = 1/4
-alphaS0 = 1
+alphaP0 = 1
+alphaS0 = 1/20
 
 alphas = {'alphaM':alphaM0, 'alphaP':alphaP0, 'alphaS':alphaS0}
 #Mangrove Gain
-betaG0 = 0.6
+betaG0 = 0.5
 betaP0 = 1-betaG0
 
 # Mangrove loss
@@ -56,7 +56,7 @@ growS0 = -1
 propPrecip = 1.5
 growPrecip = 1
 evaptM = 0.8
-precipBeta = 0.5
+precipBeta = 0.2
 
 drownHyd0 = 0.5
 drownM0 = 1
@@ -86,13 +86,13 @@ volP0 = -1
 volHyd0 = 1.5
 volPrecip = 0.5
 
-eroM0 = -1.5
+eroM0 = -2
 
 subsMort0 = 1.5
 subsHyd0 = 1
 subsP0 = 0.5
 
-hydP0 = -1
+hydP0 = -0.5
 
 peats = {'accSed':accSed0, 'sedHyd':sedHyd0, 'accM':accM0,\
          'retLitt':retLitt0, 'retHyd':retHyd0, 'volGrow':volGrow0,
@@ -101,10 +101,10 @@ peats = {'accSed':accSed0, 'sedHyd':sedHyd0, 'accM':accM0,\
 
 # Salinity
 concEvapt = 1.0 
-concS = 1
+concS = 0
 concHyd = 1
 
-decrS = 1
+decrS = 0
 decrPrecip = 1
 
 evaptS = -1

@@ -25,13 +25,14 @@ n = 1000000
 # ---------------
 #years
 alphaM0 = 3/12
-alphaM1 = 2
+alphaM1 = 5
 
 alphaP0 = 6/12
-alphaP1 = 2
+alphaP1 = 10
 
 alphaS0 = 50
 alphaS1 = 100
+
 mangLifespan= 4 # average leaf lifespan #https://academic.oup.com/treephys/article/30/9/1148/1641261
 unitPeatTime = 1/2 # how long does a chunk of peat topsoil last? https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/2010WR009492
 unitSaltTime = 0.5 # timescale for unit of salt https://link.springer.com/article/10.1023/A:1008470719913
@@ -231,7 +232,7 @@ for typ in set(typeList):
 corrs = {k:(np.corrcoef(data[k],stab)[0,1]) for (k,v) in data.items() }
 
 #Sort out only the big correlations
-numPlot = 5 # number of variables to plot
+numPlot = 10 # number of variables to plot
 remNum = len(corrs.items()) - numPlot #number of variables to remove
 absCorrs = {k: np.abs(v) for (k,v) in corrs.items() if not isnan(v)}
 corrsSorted = sorted(absCorrs.items(), key=lambda x: x[1], reverse=True)

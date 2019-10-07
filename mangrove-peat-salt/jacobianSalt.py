@@ -71,6 +71,10 @@ def computeJac(data):
     evaptM = data['evaptM']
     evaptS = data['evaptS']
     
+    concS = 0
+    decrS = 0
+    
+
     
     # Define Jacobian matrix elements
     # Note syntax here is not strictly correct - dmdm == (dm/dt)/dm
@@ -111,8 +115,7 @@ def computeJac(data):
     
     dsdm = evaptM*(concEvapt - decrPrecip*precipBeta)
     dsdp = concHyd*hydP
-    dsds = concEvapt*evaptS+concS - decrPrecip*precipBeta*evaptS-decrS
-    dsds = concS - decrS
+    dsds = concEvapt*evaptS - decrPrecip*precipBeta*evaptS
     
     # alpha paramater array
     alphas = np.array([ [alphaM, 0, 0], [0, alphaP, 0], [0, 0, alphaS]])

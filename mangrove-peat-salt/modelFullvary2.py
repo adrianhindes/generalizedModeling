@@ -95,6 +95,7 @@ growM = random.uniform(0, 1, n)
 growS = random.uniform(-2,0.0,n)
 
 evaptM = random.uniform(0,1,n)
+
 precipBeta = random.uniform(0,0.3,n) #https://journals.ametsoc.org/doi/abs/10.1175/1520-0442%281993%29006%3C1077%3AEOCPR%3E2.0.CO%3B2
 
 propPrecip = random.uniform(r0,3,n)
@@ -137,7 +138,6 @@ decrS = random.uniform(r0,r1,n)
 decrPrecip = random.uniform(r0,r1,n)
 
 evaptS = random.uniform(-2,0,n)
-evaptM = random.uniform(r0,r1,n)
 
 
 def stability(eigs):

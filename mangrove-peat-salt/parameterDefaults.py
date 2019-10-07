@@ -55,14 +55,14 @@ growS0 = -1
 
 propPrecip = 1.5
 growPrecip = 1
-evaptM = 0.8
+evaptM = 0.5
 precipBeta = 0.2
 
 drownHyd0 = 0.5
 drownM0 = 1
 
 stressM0 = 1
-stressS0 = 0.5
+stressS0 = 2
 
 littM0 = 1
 
